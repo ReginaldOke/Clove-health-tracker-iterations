@@ -55,6 +55,7 @@
    Concept 1 (body.c1) — dressed plates
    ============================================================ */
 body.c1 .gl-body { gap: 18px; }
+body.c1 .g2-goal { margin: 16px 0 14px; }
 body.c1 .gl-week { margin: 14px 0; }
 /* a planned dinner wears a little calendar until it is cooked */
 .g2-meal__badge.cal { background: var(--white) !important; box-shadow: 0 2px 8px rgba(15, 18, 21, 0.2); }
