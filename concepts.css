@@ -11,13 +11,13 @@
 .gl-count {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 21px;
+  gap: 7px;
+  font-size: 32px;
   font-weight: 600;
+  letter-spacing: -0.32px;
   color: var(--black-300);
-  transform: translateY(2px);
 }
-.gl-count img { width: 11px; height: 7px; transform: rotate(-90deg); opacity: 0.45; }
+.gl-count img { width: 14px; height: 8px; transform: rotate(90deg); opacity: 0.45; }
 /* the green health-goal mark anchors every concept's header */
 .gl-heart {
   margin-left: auto;

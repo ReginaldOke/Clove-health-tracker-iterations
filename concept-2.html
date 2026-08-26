@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" href="data:," />
 <title>Clove - Health goals, concept 2</title>
-<link rel="stylesheet" href="base.css?v=20260827a" />
-<link rel="stylesheet" href="memory.css?v=20260827a" />
-<link rel="stylesheet" href="goals.css?v=20260827a" />
-<link rel="stylesheet" href="goals2.css?v=20260827a" />
-<link rel="stylesheet" href="goals3.css?v=20260827a" />
-<link rel="stylesheet" href="concepts.css?v=20260827a" />
+<link rel="stylesheet" href="base.css?v=20260827b" />
+<link rel="stylesheet" href="memory.css?v=20260827b" />
+<link rel="stylesheet" href="goals.css?v=20260827b" />
+<link rel="stylesheet" href="goals2.css?v=20260827b" />
+<link rel="stylesheet" href="goals3.css?v=20260827b" />
+<link rel="stylesheet" href="concepts.css?v=20260827b" />
 </head>
 <body class="goals goals2 g3">
 <div class="phone">
@@ -85,11 +85,11 @@
   </div>
 </div>
 
-<script src="app-lite.js?v=20260827a"></script>
-<script src="memory.js?v=20260827a"></script>
-<script src="goals.js?v=20260827a"></script>
-<script src="plates.js?v=20260827a"></script>
-<script src="tracker.js?v=20260827a"></script>
+<script src="app-lite.js?v=20260827b"></script>
+<script src="memory.js?v=20260827b"></script>
+<script src="goals.js?v=20260827b"></script>
+<script src="plates.js?v=20260827b"></script>
+<script src="tracker.js?v=20260827b"></script>
 <script>
   (function () {
     var G = CloveGoals, T = Tracker;
@@ -204,6 +204,8 @@
       renderMeals(-1);
       document.getElementById("glPlanT").textContent = "Plan meals to hit your " + s.label.toLowerCase() + " goal";
       document.getElementById("glPlanS").textContent = "Health goal: " + s.label;
+      document.getElementById("glPlanWrap").style.display = s.label === "Iron" ? "" : "none";
+      if (s.label !== "Iron") return;
       var planCard = document.querySelector("#glPlanWrap .ai-card");
       clearTimeout(planCard._t);
       if (animate) {
