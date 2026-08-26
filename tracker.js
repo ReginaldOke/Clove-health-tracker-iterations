@@ -40,8 +40,8 @@
         null, null,
       ],
     },
-    Energy: {
-      flavor: "energising",
+    Fibre: {
+      flavor: "fibre-rich",
       prov: "Suggested by Clove",
       recipes: [
         { t: "Crispy rice bowl", img: R + "rice-bowl.webp", time: "30 min" },
@@ -53,7 +53,7 @@
         { img: R + "grain-bowl.webp", t: "Grain bowl", done: true },
         { img: R + "stirfry.webp", t: "Weeknight stir fry", done: true },
         { img: R + "cauliflower-bowl.webp", t: "Cauliflower bowl", done: true },
-        { img: R + "fish-tomato.webp", t: "Fish in tomato", done: true },
+        { img: R + "white-beans.webp", t: "Beans in olive oil", done: true },
         null,
       ],
     },
@@ -81,15 +81,18 @@
   function doneCount(label) { return slotsFor(label).filter(function (s) { return s && s.done; }).length; }
   /* dinners, not milligrams: each ticked dinner is worth ~19% of the ring */
   function pctFor(label) { return Math.min(0.96, 0.19 * doneCount(label)); }
-  /* ring colours follow the plate's food: egg = orange, salad = green */
-  var RING_COLOR = {
+  /* the deck's own dressing over goals.js: the third ring is FIBRE here
+     (not Energy), and ring colours follow the plate's food:
+     egg = orange, salad = green */
+  var RING_OVERRIDE = {
     Protein: { color: "var(--paprika-300)", track: "var(--paprika-100)" },
-    Energy: { color: "var(--kale-300)", track: "var(--kale-100)" },
+    Energy: { label: "Fibre", color: "var(--kale-300)", track: "var(--kale-100)", goalN: 30, unit: "g" },
   };
   function slides() {
     return G.rings().map(function (r) {
-      var o = RING_COLOR[r.label] || r;
-      return { label: r.label, pct: pctFor(r.label), color: o.color, track: o.track, ring: r };
+      var o = RING_OVERRIDE[r.label] || {};
+      var label = o.label || r.label;
+      return { label: label, pct: pctFor(label), color: o.color || r.color, track: o.track || r.track, goalN: o.goalN, unit: o.unit, ring: r };
     });
   }
 
@@ -358,13 +361,13 @@
     var r = s.ring;
     var svg = document.getElementById("glChart");
     if (!svg) return;
-    var goalN = r.goalN || parseFloat(String(r.goal).replace(/[^\d.]/g, "")) || 1;
+    var goalN = s.goalN || r.goalN || parseFloat(String(r.goal).replace(/[^\d.]/g, "")) || 1;
     /* a cooked dinner is worth a real dinner's dose, and the y scale is
        trimmed so every tick moves the line a visible step: five dinners
        carry the line right up to the dotted goal line */
     var dinnerWorth = 0.55 * goalN;
     var nowN = T.doneCount(s.label) * dinnerWorth;
-    var unit = r.unit || String(r.goal).replace(/[\d.,\s]/g, "");
+    var unit = s.unit || r.unit || String(r.goal).replace(/[\d.,\s]/g, "");
     var weekPct = [0.31, 0.35, 0.28, 0, 0, 0, 0];
     var W = Math.round(svg.clientWidth) || 320, H = Math.round(svg.clientHeight) || 84, PAD = 8, run = 0, cum = [];
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
@@ -395,7 +398,7 @@
     var fmt = function (n) { return (Math.round(n * 10) / 10).toLocaleString(); };
     document.getElementById("glWeekTot").textContent = fmt(cum[3]) + unit;
     document.getElementById("glWeekGoal").textContent = fmt(weekGoal) + unit;
-    document.getElementById("g2WeekLbl").textContent = r.label + " this week";
+    document.getElementById("g2WeekLbl").textContent = s.label + " this week";
     var line = svg.querySelector(".gl-line");
     var len = line.getTotalLength();
     line.style.strokeDasharray = len; line.style.strokeDashoffset = len;

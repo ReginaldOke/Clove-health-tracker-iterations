@@ -131,7 +131,7 @@
     IMG: {
       Iron: "assets/img/goals/plate-steak.svg",
       Protein: "assets/img/goals/plate-egg.svg",
-      Energy: "assets/img/goals/plate-salad2.svg",
+      Fibre: "assets/img/goals/plate-salad2.svg",
     },
     /* markup for one plate. label: Iron/Protein/Energy (unknown labels get
        the Iron salad). n: portions shown at rest (the rest render with

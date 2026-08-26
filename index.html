@@ -142,7 +142,7 @@
 </div>
 
 <footer class="legend">
-  <h2><span class="letter" id="cletter">A</span><b id="cname">The dressed plate</b></h2>
+  <h2><span class="letter" id="cletter">A</span></h2>
   <p id="cdesc">Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it.</p>
 </footer>
 
@@ -176,7 +176,6 @@
       if (instant) { void track.offsetWidth; track.style.transition = ""; }
       for (var k = 0; k < slots.length; k++) slots[k].classList.toggle("on", k === i);
       document.getElementById("cletter").textContent = ["A", "B", "C"][i];
-      document.getElementById("cname").textContent = CONCEPTS[i].name;
       document.getElementById("cdesc").textContent = CONCEPTS[i].desc;
       history.replaceState(null, "", "#" + (i + 1));
     }
