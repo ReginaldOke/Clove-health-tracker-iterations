@@ -102,152 +102,90 @@ body.c1 .gl-week { margin: 14px 0; }
 .g3-cards { flex-wrap: wrap; overflow: visible; }
 
 /* ============================================================
-   Concept 3 (body.c3) — the set table
+   Concept 3 (body.b3) — Day by day
+   The Apple Health week chart, in Clove clothing: light, warm,
+   a dinner photo under every bar.
    ============================================================ */
-.c3-hero { padding: 18px 18px 20px; }
-.c3-head { display: flex; align-items: flex-start; gap: 14px; }
-.c3-heart {
+body.b3 .gl-body { gap: 20px; }
+
+/* goal switcher: < Iron goal > */
+.b3-switch { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 2px; }
+.b3-switch h2 { min-width: 150px; text-align: center; font-size: 20px; font-weight: 600; letter-spacing: -0.2px; color: var(--black-500); }
+.b3-chev {
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background: linear-gradient(-90deg, #c9e08f 0%, #1aab56 26.9%, #1aab56 49%, #d5ff73 100%);
-  box-shadow: 0 6px 14px rgba(26, 171, 86, 0.28);
-}
-.c3-heart img { width: 18px; height: 18px; }
-.c3-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--kale-500);
-}
-.c3-eyebrow img { width: 11px; height: 12px; }
-.c3-focus { margin-top: 4px; font-size: 26px; font-weight: 600; line-height: 1.15; letter-spacing: -0.4px; color: var(--black-500); }
-.c3-prov { margin-top: 4px; font-size: 12.5px; line-height: 1.4; color: var(--black-400); }
-.c3-prov .spark { color: var(--eggplant-300); margin-right: 2px; }
-
-/* the table, seen from above: five places, one per dinner */
-.c3-table { position: relative; height: 296px; margin-top: 14px; }
-.c3-table.swap { animation: c3-land 520ms cubic-bezier(0.22, 1.2, 0.36, 1) 1; }
-@keyframes c3-land { from { opacity: 0; transform: scale(0.9); } }
-.c3-cloth {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 324px;
-  height: 214px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: linear-gradient(180deg, #fcfaf4 0%, #f3eee1 100%);
-  border: 1.5px solid #ede7d7;
-  box-shadow: inset 0 -10px 22px rgba(15, 18, 21, 0.035), 0 10px 22px rgba(15, 18, 21, 0.06);
-}
-.c3-centerpiece {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  pointer-events: none;
-  text-align: center;
-}
-.c3-centerpiece img { width: 13px; height: 14px; opacity: 0.9; }
-.c3-centerpiece span { font-size: 11.5px; line-height: 1.35; color: var(--black-400); }
-.c3-centerpiece b { font-weight: 600; color: var(--kale-500); }
-
-/* a place at the table */
-.c3-seat {
-  position: absolute;
-  width: 58px;
-  height: 58px;
-  padding: 0;
-  border: none;
-  border-radius: 999px;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  transform: translate(-50%, -50%);
-  transition: transform 200ms cubic-bezier(0.22, 1.4, 0.36, 1);
-}
-.c3-seat:active { transform: translate(-50%, -50%) scale(0.9); }
-.c3-seat .plate-art { position: absolute; inset: 0; width: 100%; height: 100%; }
-.c3-seat--in { animation: seat-pop 460ms cubic-bezier(0.22, 1.4, 0.36, 1) both; }
-@keyframes seat-pop { from { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-.c3-seat__badge {
-  position: absolute;
-  right: 1px;
-  bottom: 1px;
-  width: 17px;
-  height: 17px;
-  border-radius: 999px;
-  border: 2px solid var(--white);
-  background: var(--kale-300);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity 160ms ease, transform 280ms cubic-bezier(0.22, 1.5, 0.36, 1);
-}
-.c3-seat__badge img { width: 8px; height: 6px; }
-.c3-seat.done .c3-seat__badge { opacity: 1; transform: scale(1); }
-/* an empty place waiting for a dinner */
-.c3-seat--add { background: rgba(255, 255, 255, 0.55); border: 2px dashed var(--black-200); }
-.c3-seat--add::before, .c3-seat--add::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  background: var(--black-300);
-  border-radius: 2px;
-}
-.c3-seat--add::before { width: 14px; height: 2px; transform: translate(-50%, -50%); }
-.c3-seat--add::after { width: 2px; height: 14px; transform: translate(-50%, -50%); }
-/* the dinner's name, whispered under each set place */
-.c3-seat__day {
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 3px);
-  transform: translateX(-50%);
-  font-size: 10px;
-  line-height: 1;
-  color: var(--black-300);
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.c3-story { margin-top: 6px; text-align: center; font-size: 15px; line-height: 1.4; color: var(--black-400); }
-.c3-story b { font-weight: 600; color: var(--black-500); }
-
-/* the other goals, deliberately quiet: label + chips, no numbers */
-.c3-switch { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0 4px; }
-.c3-switch__lbl { font-size: 12.5px; color: var(--black-400); }
-.c3-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 14px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 999px;
   background: var(--black-100);
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--black-500);
   cursor: pointer;
-  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background 160ms ease;
+  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.c3-chip:active { transform: scale(0.94); }
-body.c3 .gl-body { gap: 20px; }
+.b3-chev:active { transform: scale(0.88); }
+.b3-chev img { width: 11px; height: 7px; }
+
+/* everything under the switcher swaps with the goal */
+.b3-body { display: flex; flex-direction: column; gap: 20px; transition: opacity 150ms ease; }
+.b3-body--fade { opacity: 0; }
+
+/* the headline stat, Apple's hierarchy in Clove type */
+.b3-stat { margin-top: 2px; }
+.b3-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--kale-500); }
+.b3-num { margin-top: 6px; display: flex; align-items: baseline; gap: 7px; }
+.b3-num b { font-size: 40px; font-weight: 600; letter-spacing: -0.8px; line-height: 1; color: var(--black-500); }
+.b3-num span { font-size: 16px; font-weight: 400; color: var(--black-400); }
+.b3-range { margin-top: 6px; font-size: 13px; color: var(--black-400); }
+
+/* ---- the week chart ---- */
+.b3-chart { position: relative; padding-right: 46px; margin-top: 2px; }
+.b3-lines { position: absolute; left: 0; right: 46px; top: 0; height: 190px; pointer-events: none; }
+.b3-line { position: absolute; left: 0; right: 0; border-top: 1.5px dashed #e6e2d6; }
+.b3-line--base { border-top: 1.5px solid var(--black-200); }
+.b3-line__lbl { position: absolute; right: -46px; top: -7px; width: 40px; text-align: left; padding-left: 8px; font-size: 11px; line-height: 1; color: var(--black-300); }
+/* the goal, a dotted line in the goal's colour */
+.b3-goal { position: absolute; left: 0; right: 0; border-top: 2px dotted currentColor; }
+.b3-goal__lbl {
+  position: absolute;
+  right: 0;
+  top: -15px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  color: currentColor;
+}
+.b3-cols { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); }
+.b3-cell { display: flex; flex-direction: column; align-items: center; }
+.b3-barwrap { height: 190px; display: flex; align-items: flex-end; }
+.b3-bar {
+  width: 26px;
+  border-radius: 9px 9px 3px 3px;
+  background: var(--black-100);
+  transform-origin: bottom;
+  animation: b3-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+.b3-bar--rich { background: var(--tone-soft); border: 2px solid var(--tone); border-bottom-width: 0; }
+@keyframes b3-grow { from { transform: scaleY(0); } }
+.b3-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  margin-top: 10px;
+  border: 2px solid var(--black-200);
+  overflow: hidden;
+  opacity: 0;
+  animation: rise-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+.b3-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.b3-thumb--rich { border-color: var(--tone); }
+.b3-thumb--empty { border-style: dashed; background: #fcfbfb; opacity: 1; animation: none; }
+.b3-day { margin-top: 7px; font-size: 11px; color: var(--black-300); }
+.b3-day.today { color: var(--black-500); font-weight: 600; }
 
 /* ============================================================
    Meal actions sheet — same bones as plan.html's meal sheet

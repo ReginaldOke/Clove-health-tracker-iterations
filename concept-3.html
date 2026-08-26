@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="goals2.css" />
 <link rel="stylesheet" href="concepts.css" />
 </head>
-<body class="goals goals2 c3">
+<body class="goals goals2 b3 c1">
 <div class="phone">
 
   <nav class="gl-nav"></nav>
@@ -24,26 +24,35 @@
       </button>
     </div>
 
-    <!-- one clear focus; five places at the table, one per dinner -->
-    <section class="pcard c3-hero" id="c3Hero">
-      <div class="c3-head">
-        <span class="c3-heart"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></span>
-        <div>
-          <p class="c3-eyebrow"><img src="assets/icons/clove-kale.svg" alt="" />Your focus this week</p>
-          <h2 class="c3-focus" id="c3Focus">Iron</h2>
-          <p class="c3-prov" id="c3Prov"><span class="spark">✦</span> Added from your voice note</p>
-        </div>
-      </div>
-      <div class="c3-table" id="c3Table">
-        <div class="c3-cloth"></div>
-        <div class="c3-centerpiece" id="c3Center"></div>
-        <div id="c3Seats"></div>
-      </div>
-      <p class="c3-story" id="c3Story"></p>
-    </section>
+    <!-- < Iron goal > : the chevrons walk through the tracked goals -->
+    <div class="b3-switch">
+      <button class="b3-chev" id="b3Prev" aria-label="Previous goal"><img src="assets/icons/chevron-rt.svg" alt="" style="transform:rotate(90deg)" /></button>
+      <h2 id="b3Title">Iron goal</h2>
+      <button class="b3-chev" id="b3Next" aria-label="Next goal"><img src="assets/icons/chevron-rt.svg" alt="" style="transform:rotate(-90deg)" /></button>
+    </div>
 
-    <!-- the other goals stay quiet: no rings, no numbers -->
-    <div class="c3-switch" id="c3Switch"></div>
+    <div class="b3-body" id="b3Body">
+
+      <!-- the headline stat -->
+      <div class="b3-stat">
+        <p class="b3-eyebrow">Daily average</p>
+        <p class="b3-num"><b id="b3Avg">0</b><span id="b3Unit">mg iron</span></p>
+        <p class="b3-range">This week · 20 to 26 Aug</p>
+      </div>
+
+      <!-- the week, one bar and one plate per day -->
+      <div class="b3-chart" id="b3Chart">
+        <div class="b3-lines" id="b3Lines"></div>
+        <div class="b3-cols" id="b3Cols"></div>
+      </div>
+
+      <!-- the five dinners that get you there -->
+      <section class="g2-goal">
+        <p class="g2-goalline" id="g2GoalLine">Goal: Eat 5 iron-rich dinners</p>
+        <div class="g2-meals" id="g2Meals"></div>
+      </section>
+
+    </div>
 
     <div class="gl-plan" id="glPlanWrap">
       <button class="ai-card" id="glPlan">
@@ -88,9 +97,60 @@
 <script>
   (function () {
     var T = Tracker, TOTAL = T.TOTAL;
+    var R = "assets/img/recipes/";
 
-    /* one goal owns the screen; the chips can hand it the focus */
-    var focus = sessionStorage.getItem("c3Focus") || "Iron";
+    /* the goal accent, softened + solid, per ring colour token */
+    var TONE = {
+      "var(--eggplant-300)": { soft: "var(--eggplant-100)", solid: "var(--eggplant-300)" },
+      "var(--kale-300)": { soft: "var(--kale-100)", solid: "var(--kale-300)" },
+      "var(--paprika-300)": { soft: "var(--paprika-100)", solid: "var(--paprika-300)" },
+    };
+
+    /* one week of dinners per goal: three recommended goal-rich meals
+       past the dotted goal line, two everyday meals, two nights off */
+    var CHART = {
+      Iron: {
+        unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12,
+        days: [
+          { img: R + "short-ribs.webp", v: 9.2, rich: true },
+          { img: R + "creamy-pasta.webp", v: 2.1 },
+          null,
+          { img: R + "greens.webp", v: 8.4, rich: true },
+          { img: R + "white-beans.webp", v: 8.8, rich: true },
+          { img: R + "greek-salad.webp", v: 1.8 },
+          null,
+        ],
+      },
+      Protein: {
+        unit: "g", unitLabel: "g protein", goal: 40, yMax: 60,
+        days: [
+          { img: R + "chicken-bake.webp", v: 52, rich: true },
+          { img: R + "greek-salad.webp", v: 14 },
+          null,
+          { img: R + "drumsticks.webp", v: 46, rich: true },
+          { img: R + "roast-chicken.webp", v: 55, rich: true },
+          { img: R + "creamy-pasta.webp", v: 18 },
+          null,
+        ],
+      },
+      Energy: {
+        unit: "kJ", unitLabel: "kJ energy", goal: 2600, yMax: 4000,
+        days: [
+          { img: R + "rice-bowl.webp", v: 2900, rich: true },
+          { img: R + "cucumber-salad.webp", v: 800 },
+          null,
+          { img: R + "stirfry.webp", v: 2750, rich: true },
+          { img: R + "charred-broccoli.webp", v: 2680, rich: true },
+          { img: R + "baked-pasta.webp", v: 1400 },
+          null,
+        ],
+      },
+    };
+    var LETTERS = ["M", "T", "W", "T", "F", "S", "S"], TODAY = 3;
+    function fmt(n) { return (Math.round(n * 10) / 10).toLocaleString(); }
+
+    /* the goal the chevrons have walked to */
+    var focus = sessionStorage.getItem("b3Focus") || "Iron";
     function slideFor(label) {
       var all = T.slides();
       for (var i = 0; i < all.length; i++) if (all[i].label === label) return all[i];
@@ -99,87 +159,88 @@
     }
     T.cur = function () { return slideFor(focus); };
 
-    /* five places around the table (relative to its centre) */
-    var SEATS = [
-      { x: 0, y: -78 },
-      { x: 112, y: -27 },
-      { x: 74, y: 62 },
-      { x: -74, y: 62 },
-      { x: -112, y: -27 },
-    ];
-
-    function shortName(t) { return t.length > 13 ? t.slice(0, 12).replace(/ $/, "") + "…" : t; }
-
-    /* ---- the table: cooked places hold a full plate of the goal's food ---- */
-    function renderSeats(popIdx) {
-      document.getElementById("c3Seats").innerHTML = T.slotsFor(focus).map(function (m, i) {
-        var pos = 'style="left:calc(50% + ' + SEATS[i].x + 'px);top:calc(50% + ' + SEATS[i].y + 'px)"';
-        if (!m) return '<button class="c3-seat c3-seat--add" data-i="' + i + '" ' + pos + ' aria-label="Add a dinner"></button>';
-        return '<button class="c3-seat' + (m.done ? " done" : "") + (i === popIdx ? " c3-seat--in" : "") + '" data-i="' + i + '" ' + pos + ' aria-label="' + m.t + '">' +
-          ClovePlates.svg(focus, m.done ? TOTAL : 0) +
-          '<span class="c3-seat__badge"><img src="assets/icons/check-sm.svg" alt="" /></span>' +
-          '<span class="c3-seat__day">' + shortName(m.t) + "</span></button>";
+    /* ---- the chart ---- */
+    function renderChart() {
+      var s = T.cur(), c = CHART[s.label] || CHART.Iron;
+      var tone = TONE[s.color] || TONE["var(--eggplant-300)"];
+      document.getElementById("b3Title").textContent = s.label + " goal";
+      /* stat: the average over the days you cooked */
+      var cooked = c.days.filter(Boolean);
+      var avg = cooked.reduce(function (a, d) { return a + d.v; }, 0) / cooked.length;
+      document.getElementById("b3Avg").textContent = fmt(avg);
+      document.getElementById("b3Unit").textContent = c.unitLabel;
+      /* gridlines at max and midway, the goal as a dotted colour line */
+      var H = 190;
+      function yTop(v) { return (1 - v / c.yMax) * H; }
+      document.getElementById("b3Lines").innerHTML =
+        '<div class="b3-line" style="top:0"><span class="b3-line__lbl">' + fmt(c.yMax) + "</span></div>" +
+        '<div class="b3-line" style="top:' + yTop(c.yMax / 2).toFixed(1) + 'px"><span class="b3-line__lbl">' + fmt(c.yMax / 2) + "</span></div>" +
+        '<div class="b3-line b3-line--base" style="top:' + H + 'px"><span class="b3-line__lbl">0</span></div>' +
+        '<div class="b3-goal" style="top:' + yTop(c.goal).toFixed(1) + "px;color:" + tone.solid + '"><span class="b3-goal__lbl">Goal ' + fmt(c.goal) + c.unit + "</span></div>";
+      /* one column per day: bar, plate, letter */
+      document.getElementById("b3Cols").innerHTML = c.days.map(function (d, i) {
+        var bar = "", thumb;
+        if (d) {
+          bar = '<div class="b3-bar' + (d.rich ? " b3-bar--rich" : "") + '" style="--d:' + (i * 60) + "ms;height:" + ((d.v / c.yMax) * 100).toFixed(1) + "%;--tone:" + tone.solid + ";--tone-soft:" + tone.soft + '"></div>';
+          thumb = '<span class="b3-thumb' + (d.rich ? " b3-thumb--rich" : "") + '" style="--d:' + (120 + i * 60) + "ms;--tone:" + tone.solid + '"><img src="' + d.img + '" alt="" /></span>';
+        } else {
+          thumb = '<span class="b3-thumb b3-thumb--empty"></span>';
+        }
+        return '<div class="b3-cell"><div class="b3-barwrap">' + bar + "</div>" + thumb +
+          '<span class="b3-day' + (i === TODAY ? " today" : "") + '">' + LETTERS[i] + "</span></div>";
       }).join("");
     }
-    /* animate one seat's plate filling (or clearing) after a tick */
-    function syncSeat(btn, done) {
-      btn.classList.toggle("done", done);
-      var pps = btn.querySelectorAll(".pp");
-      pps.forEach(function (g, i) {
-        g.style.transitionDelay = done ? (i * 70) + "ms" : "0ms";
-        g.classList.toggle("off", !done);
-      });
+
+    /* ---- the five dinners (same component as concept A) ---- */
+    function renderMeals(popIdx) {
+      var s = T.cur();
+      document.getElementById("g2GoalLine").textContent = "Goal: Eat " + TOTAL + " " + T.metaFor(s.label).flavor + " dinners";
+      document.getElementById("g2Meals").innerHTML = T.slotsFor(s.label).map(function (m, i) {
+        if (!m) return '<button class="g2-meal g2-meal--empty" data-i="' + i + '" aria-label="Add a dinner"></button>';
+        return '<button class="g2-meal' + (m.done ? " done" : " g2-meal--planned") + (i === popIdx ? " g2-meal--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +
+          '<img src="' + m.img + '" alt="" />' +
+          (m.done
+            ? '<span class="g2-meal__badge" style="background:' + T.cur().color + '"><img src="assets/icons/check-sm.svg" alt="" /></span>'
+            : '<span class="g2-meal__badge cal"><img src="assets/icons/cal-24-dark.svg" alt="" /></span>') +
+          "</button>";
+      }).join("");
     }
-    function renderCenter() {
-      var n = T.doneCount(focus);
-      document.getElementById("c3Center").innerHTML =
-        '<img src="assets/icons/clove-kale.svg" alt="" />' +
-        (n >= TOTAL ? "<span><b>Table set</b></span>" : "<span><b>" + (TOTAL - n) + "</b> to go</span>");
-    }
-    function renderStory() {
-      var n = T.doneCount(focus), flavor = T.metaFor(focus).flavor;
-      var el = document.getElementById("c3Story");
-      el.innerHTML = n >= TOTAL
-        ? "<b>All " + TOTAL + "</b> " + flavor + " dinners cooked · your table is set"
-        : "<b>" + n + " of " + TOTAL + "</b> " + flavor + " dinners cooked this week";
-    }
-    document.getElementById("c3Seats").addEventListener("click", function (e) {
-      var btn = e.target.closest(".c3-seat");
+    document.getElementById("g2Meals").addEventListener("click", function (e) {
+      var btn = e.target.closest(".g2-meal");
       if (!btn) return;
       var i = Number(btn.dataset.i);
-      var slots = T.slotsFor(focus);
+      var slots = T.slotsFor(T.cur().label);
       if (!slots[i]) { T.openModal(); return; }
-      /* tick a dinner: that place setting fills with food */
       slots[i].done = !slots[i].done;
       T.saveState();
-      syncSeat(btn, slots[i].done);
-      renderCenter();
-      renderStory();
-      if (slots[i].done && T.maybeCelebrate(focus)) {
-        var table = document.getElementById("c3Table");
-        table.classList.remove("celebrate"); void table.offsetWidth;
-        table.classList.add("celebrate");
+      renderMeals(-1);
+      if (slots[i].done && T.maybeCelebrate(T.cur().label)) {
+        var chart = document.getElementById("b3Chart");
+        chart.classList.remove("celebrate"); void chart.offsetWidth;
+        chart.classList.add("celebrate");
       }
     });
 
-    /* ---- head + chips + nudge ---- */
-    function renderHead() {
-      document.getElementById("c3Focus").textContent = focus;
-      document.getElementById("c3Prov").innerHTML = '<span class="spark">✦</span> ' + T.metaFor(focus).prov;
+    /* ---- goal switching: < > with a soft crossfade ---- */
+    function step(dir) {
+      var all = T.slides();
+      var idx = 0;
+      for (var i = 0; i < all.length; i++) if (all[i].label === focus) idx = i;
+      focus = all[(idx + dir + all.length) % all.length].label;
+      sessionStorage.setItem("b3Focus", focus);
+      var body = document.getElementById("b3Body");
+      body.classList.add("b3-body--fade");
+      clearTimeout(body._t);
+      body._t = setTimeout(function () {
+        renderChart();
+        renderMeals(-1);
+        renderNudge(false);
+        body.classList.remove("b3-body--fade");
+      }, 150);
     }
-    function renderChips() {
-      var others = T.slides().filter(function (s) { return s.label !== focus; });
-      document.getElementById("c3Switch").innerHTML =
-        '<span class="c3-switch__lbl">Also watching:</span>' +
-        others.map(function (s) { return '<button class="c3-chip" data-l="' + s.label + '">' + s.label + "</button>"; }).join("");
-    }
-    document.getElementById("c3Switch").addEventListener("click", function (e) {
-      var chip = e.target.closest(".c3-chip");
-      if (!chip) return;
-      focus = chip.dataset.l;
-      sessionStorage.setItem("c3Focus", focus);
-      render(false, true);
-    });
+    document.getElementById("b3Prev").addEventListener("click", function () { step(-1); });
+    document.getElementById("b3Next").addEventListener("click", function () { step(1); });
+
     function renderNudge(animate) {
       document.getElementById("glPlanT").textContent = "Plan meals to hit your " + focus.toLowerCase() + " goal";
       document.getElementById("glPlanS").textContent = "Health goal: " + focus;
@@ -198,30 +259,18 @@
       }
     }
 
-    function render(animate, swapping) {
-      renderHead();
-      renderSeats(-1);
-      renderCenter();
-      renderStory();
-      renderChips();
+    function render(animate) {
+      renderChart();
+      renderMeals(-1);
       renderNudge(animate);
-      var table = document.getElementById("c3Table");
-      if (animate || swapping) {
-        table.classList.remove("swap"); void table.offsetWidth;
-        table.classList.add("swap");
-      }
     }
 
-    T.onAdd = function (free) { renderSeats(free); };
-    T.onMealChange = function () {
-      renderSeats(-1);
-      renderCenter();
-      renderStory();
-    };
-    T.bindLongPress(document.getElementById("c3Seats"), function (i) { T.openMealSheet(i); });
-    T.bindSheet(function () { render(false, true); });
+    T.onAdd = function (free) { renderMeals(free); };
+    T.onMealChange = function () { renderMeals(-1); };
+    T.bindLongPress(document.getElementById("g2Meals"), function (i) { T.openMealSheet(i); });
+    T.bindSheet(function () { render(false); });
     T.bindNudge();
-    render(true, false);
+    render(true);
   })();
 </script>
 </body>
