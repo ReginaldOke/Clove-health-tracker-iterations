@@ -7,17 +7,28 @@
 .gl-nav { min-height: 44px; }
 
 /* "Health goals  3 ›" — the tracked-goal count sits beside the title */
-.goals2 .gl-title-row { justify-content: flex-start; align-items: center; gap: 12px; }
+.goals2 .gl-title-row { justify-content: flex-start; align-items: baseline; gap: 8px; }
 .gl-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
   font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.32px;
   color: var(--black-300);
 }
-.gl-count img { width: 14px; height: 8px; transform: rotate(90deg); opacity: 0.45; }
+/* nav row per Figma 28299-56299: back chevron left, dots menu right */
+.gl-nav__back img { width: 14px; height: 8px; transform: rotate(90deg); }
+.gl-nav__dots {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  border-radius: 100px;
+}
+.gl-nav__dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--black-500); }
 /* the green health-goal mark anchors every concept's header */
 .gl-heart {
   margin-left: auto;

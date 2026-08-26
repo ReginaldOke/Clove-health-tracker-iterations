@@ -5,23 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" href="data:," />
 <title>Clove - Health goals, concept 2</title>
-<link rel="stylesheet" href="base.css?v=20260827b" />
-<link rel="stylesheet" href="memory.css?v=20260827b" />
-<link rel="stylesheet" href="goals.css?v=20260827b" />
-<link rel="stylesheet" href="goals2.css?v=20260827b" />
-<link rel="stylesheet" href="goals3.css?v=20260827b" />
-<link rel="stylesheet" href="concepts.css?v=20260827b" />
+<link rel="stylesheet" href="base.css?v=20260827c" />
+<link rel="stylesheet" href="memory.css?v=20260827c" />
+<link rel="stylesheet" href="goals.css?v=20260827c" />
+<link rel="stylesheet" href="goals2.css?v=20260827c" />
+<link rel="stylesheet" href="goals3.css?v=20260827c" />
+<link rel="stylesheet" href="concepts.css?v=20260827c" />
 </head>
 <body class="goals goals2 g3">
 <div class="phone">
 
-  <nav class="gl-nav"></nav>
+  <nav class="gl-nav">
+    <button class="gl-nav__back" aria-label="Back"><img src="assets/icons/chevron-rt.svg" alt="" /></button>
+    <button class="gl-nav__dots" aria-label="More options"><i></i><i></i><i></i></button>
+  </nav>
 
   <main class="gl-body" id="glBody">
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
-      <span class="gl-count"><b id="glCount">3</b><img src="assets/icons/chevron-rt.svg" alt="" /></span>
-      <button class="gl-heart" id="glHeart" aria-label="Describe a health goal"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></button>
+      <span class="gl-count" id="glCount">3</span>
     </div>
 
     <!-- the empty plate wears the ring: swipe for the next goal -->
@@ -85,11 +87,11 @@
   </div>
 </div>
 
-<script src="app-lite.js?v=20260827b"></script>
-<script src="memory.js?v=20260827b"></script>
-<script src="goals.js?v=20260827b"></script>
-<script src="plates.js?v=20260827b"></script>
-<script src="tracker.js?v=20260827b"></script>
+<script src="app-lite.js?v=20260827c"></script>
+<script src="memory.js?v=20260827c"></script>
+<script src="goals.js?v=20260827c"></script>
+<script src="plates.js?v=20260827c"></script>
+<script src="tracker.js?v=20260827c"></script>
 <script>
   (function () {
     var G = CloveGoals, T = Tracker;
