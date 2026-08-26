@@ -18,6 +18,23 @@
 }
 .plate-chart > img, .plate-chart .lip-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
 
+/* the goal label gets its own band above the plates, so swiping plates
+   never slides under the text */
+body.c1 .g2-hero, .g3 .g2-hero {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+}
+body.c1 .g2-hero__meta, .g3 .g2-hero__meta {
+  position: static;
+  order: -1;
+  padding: 14px 16px 0;
+}
+body.c1 .g2-carousel { height: 176px; }
+.g3 .g2-carousel { height: 182px; }
+body.c1 .g2-dots, .g3 .g2-dots { position: static; margin-top: 2px; }
+
 /* draggable carousel: snap pauses while the pointer holds the plates */
 .g2-carousel { cursor: grab; }
 .g2-carousel.dragging { scroll-snap-type: none; cursor: grabbing; }
@@ -92,11 +109,10 @@ body.c1 .gl-week { margin: 14px 0; }
 }
 
 /* content breathes to fill the phone */
-.g3 .gl-body { gap: 24px; }
-.g3 .gl-week svg { height: 118px; }
-.g3 .g2-hero { height: 214px; }
+.g3 .gl-body { gap: 20px; }
+.g3 .gl-week svg { height: 104px; }
 
-.g3 .g3-cutlery { top: 65px; }
+.g3 .g3-cutlery { top: 80px; }
 
 /* meal cards wrap onto the next row instead of scrolling away */
 .g3-cards { flex-wrap: wrap; overflow: visible; }
