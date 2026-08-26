@@ -174,7 +174,7 @@
     }
     function go(n, instant) {
       var prev = i;
-      i = (n + CONCEPTS.length) % CONCEPTS.length;
+      i = Math.max(0, Math.min(CONCEPTS.length - 1, n));
       /* arriving at a concept replays its entrance: rings draw, bars grow */
       if (!instant && i !== prev) {
         try { slots[i].querySelector("iframe").contentWindow.location.reload(); } catch (e) {}
@@ -186,6 +186,8 @@
       for (var k = 0; k < slots.length; k++) slots[k].classList.toggle("on", k === i);
       document.getElementById("cletter").textContent = ["A", "B", "C"][i];
       document.getElementById("cdesc").textContent = CONCEPTS[i].desc;
+      document.getElementById("navPrev").style.visibility = i === 0 ? "hidden" : "visible";
+      document.getElementById("navNext").style.visibility = i === CONCEPTS.length - 1 ? "hidden" : "visible";
       history.replaceState(null, "", "#" + (i + 1));
     }
     function unhint() { document.getElementById("navNext").classList.remove("hint"); }

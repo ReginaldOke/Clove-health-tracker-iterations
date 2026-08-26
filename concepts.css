@@ -6,6 +6,19 @@
 /* no back chevron in the standalone concepts, keep the breathing room */
 .gl-nav { min-height: 44px; }
 
+/* "Health goals  3 ›" — the tracked-goal count sits beside the title */
+.goals2 .gl-title-row { justify-content: flex-start; align-items: center; gap: 12px; }
+.gl-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--black-300);
+  transform: translateY(2px);
+}
+.gl-count img { width: 11px; height: 7px; transform: rotate(-90deg); opacity: 0.45; }
+
 /* the plate + its lip ring share one coordinate frame, so they are
    always exactly concentric */
 .plate-chart {
@@ -126,13 +139,22 @@ body.c1 .g2-dots, .g3 .g2-dots { position: static; margin-top: 2px; }
   background: var(--kale-500);
 }
 
-/* ticking a meal off: the active plate grows and glows the goal colour */
-.g2-slide.tick-pulse { animation: tick-pulse 850ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
-@keyframes tick-pulse {
-  0% { transform: scale(1); filter: none; }
-  35% { transform: scale(1.07); filter: drop-shadow(0 0 16px var(--glow, #bd53ea)); }
-  70% { transform: scale(1.02); filter: drop-shadow(0 0 7px var(--glow, #bd53ea)); }
-  100% { transform: scale(1); filter: none; }
+/* ticking a meal off: the active plate grows and glows the goal colour.
+   Keyframes always carry the centring translate so the plate never
+   drifts, with a variant for concept A's enlarged active plate. */
+.plate-chart.tickp { animation: tickp-center 850ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
+body.c1 .g2-slide.on .plate-chart.tickp { animation-name: tickp-center-big; }
+@keyframes tickp-center {
+  0% { transform: translate(-50%, -50%) scale(1); filter: none; }
+  35% { transform: translate(-50%, -50%) scale(1.08); filter: drop-shadow(0 0 14px var(--glow, #bd53ea)); }
+  70% { transform: translate(-50%, -50%) scale(1.02); filter: drop-shadow(0 0 6px var(--glow, #bd53ea)); }
+  100% { transform: translate(-50%, -50%) scale(1); filter: none; }
+}
+@keyframes tickp-center-big {
+  0% { transform: translate(-50%, -50%) scale(1.14); filter: none; }
+  35% { transform: translate(-50%, -50%) scale(1.23); filter: drop-shadow(0 0 14px var(--glow, #bd53ea)); }
+  70% { transform: translate(-50%, -50%) scale(1.16); filter: drop-shadow(0 0 6px var(--glow, #bd53ea)); }
+  100% { transform: translate(-50%, -50%) scale(1.14); filter: none; }
 }
 
 /* a finished week: the plate takes a little bow */
@@ -261,7 +283,11 @@ body.b3 .gl-body { gap: 20px; }
 .b3-goal__lbl {
   position: absolute;
   right: 0;
-  top: -15px;
+  top: -19px;
+  z-index: 2;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.2px;

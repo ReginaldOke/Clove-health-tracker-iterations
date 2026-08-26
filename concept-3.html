@@ -19,6 +19,7 @@
   <main class="gl-body" id="glBody">
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
+      <span class="gl-count"><b id="glCount">3</b><img src="assets/icons/chevron-rt.svg" alt="" /></span>
     </div>
 
     <!-- < Iron goal > : the chevrons walk through the tracked goals -->
@@ -250,6 +251,7 @@
         renderChart();
         renderMeals(-1);
         renderNudge(false);
+        document.getElementById("glCount").textContent = T.slides().length;
         body.classList.remove("b3-body--fade");
       }, 150);
     }
@@ -278,6 +280,7 @@
       renderChart();
       renderMeals(-1);
       renderNudge(animate);
+      document.getElementById("glCount").textContent = T.slides().length;
     }
 
     T.onAdd = function (free) { renderMeals(free); renderChart(); };
@@ -291,6 +294,7 @@
         renderChart();
         renderMeals(-1);
         renderNudge(false);
+        document.getElementById("glCount").textContent = T.slides().length;
         body.classList.remove("b3-body--fade");
       }, 150);
     };

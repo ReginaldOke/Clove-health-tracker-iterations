@@ -20,6 +20,7 @@
   <main class="gl-body" id="glBody">
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
+      <span class="gl-count"><b id="glCount">3</b><img src="assets/icons/chevron-rt.svg" alt="" /></span>
     </div>
 
     <!-- the empty plate wears the ring: swipe for the next goal -->
@@ -186,11 +187,12 @@
       easeActiveRing();
       setGoalLine();
       T.drawWeek(T.cur());
-      if (slots[i].done) pulsePlate();
-      if (slots[i].done && T.maybeCelebrate(T.cur().label)) {
-        var chart = document.querySelectorAll("#g2Car .plate-chart")[active];
-        chart.classList.remove("celebrate"); void chart.offsetWidth;
-        chart.classList.add("celebrate");
+      if (slots[i].done) {
+        if (T.maybeCelebrate(T.cur().label)) {
+          var chart = document.querySelectorAll("#g2Car .plate-chart")[active];
+          chart.classList.remove("celebrate"); void chart.offsetWidth;
+          chart.classList.add("celebrate");
+        } else pulsePlate();
       }
     });
 
@@ -217,12 +219,12 @@
     }
     /* the plate grows and glows when a meal is ticked off */
     function pulsePlate() {
-      var slide = document.querySelectorAll("#g2Car .g2-slide")[active];
-      if (!slide) return;
-      slide.style.setProperty("--glow", T.cur().color);
-      slide.classList.remove("tick-pulse");
-      void slide.offsetWidth;
-      slide.classList.add("tick-pulse");
+      var chart = document.querySelectorAll("#g2Car .plate-chart")[active];
+      if (!chart) return;
+      chart.style.setProperty("--glow", T.cur().color);
+      chart.classList.remove("tickp");
+      void chart.offsetWidth;
+      chart.classList.add("tickp");
     }
     function cueCutlery() {
       var s = T.cur();
@@ -236,6 +238,7 @@
     function render(animate) {
       renderHero(animate);
       renderBelow(animate);
+      document.getElementById("glCount").textContent = T.slides().length;
       setTimeout(cueCutlery, animate ? 500 : 60);
     }
 
