@@ -274,6 +274,27 @@
   T.sheetDrag(modal.querySelector(".gl-sheet__card"), T.closeModal, "translate(-50%, 0)");
   T.sheetDrag(msheet.querySelector(".meal-sheet__card"), T.closeMealSheet, "");
 
+  /* ---- the Ask Clove bar, docked under everything: describing a goal
+          is the voice-first way into the goal sheet ---- */
+  var ask = document.createElement("div");
+  ask.className = "ask-bar";
+  ask.innerHTML =
+    '<button class="ask-bar__pill" aria-label="Describe a health goal">' +
+    '<img class="ask-bar__clove" src="assets/icons/clove-kale.svg" alt="" />' +
+    '<span class="ask-bar__ph">Describe a health goal</span>' +
+    '<span class="ask-bar__mic"><svg viewBox="0 0 20 16" width="17" height="14" fill="none"><g fill="#fff">' +
+    '<rect x="0" y="5" width="2.5" height="6" rx="1.25"/>' +
+    '<rect x="4.4" y="2.6" width="2.5" height="10.8" rx="1.25"/>' +
+    '<rect x="8.75" y="0" width="2.5" height="16" rx="1.25"/>' +
+    '<rect x="13.1" y="2.6" width="2.5" height="10.8" rx="1.25"/>' +
+    '<rect x="17.5" y="5" width="2.5" height="6" rx="1.25"/>' +
+    "</g></svg></span></button>";
+  document.querySelector(".phone").appendChild(ask);
+  ask.querySelector(".ask-bar__pill").addEventListener("click", function () {
+    var edit = document.getElementById("glEdit");
+    if (edit) edit.click();
+  });
+
   /* ---- goal sheet ("What are you working on?") ---- */
   var sheet = document.getElementById("glSheet");
   T.bindSheet = function (render) {
