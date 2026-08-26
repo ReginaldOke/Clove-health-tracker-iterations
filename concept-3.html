@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:," />
+<title>Clove - Health goals, concept 3</title>
+<link rel="stylesheet" href="base.css" />
+<link rel="stylesheet" href="memory.css" />
+<link rel="stylesheet" href="goals.css" />
+<link rel="stylesheet" href="goals2.css" />
+<link rel="stylesheet" href="concepts.css" />
+</head>
+<body class="goals goals2">
+<div class="phone">
+
+  <nav class="gl-nav"></nav>
+
+  <main class="gl-body" id="glBody">
+    <div class="gl-title-row">
+      <h1 class="gl-title">Health goals</h1>
+      <button class="gl-edit" id="glEdit" aria-label="Edit health goals">
+        <span class="ico ico-20"><img src="assets/icons/pencil.svg" alt="" style="width:16px;height:16px" /></span>
+      </button>
+    </div>
+
+    <!-- one clear focus; the plate fills as the week gets cooked -->
+    <section class="pcard c3-hero" id="c3Hero">
+      <div class="c3-head">
+        <span class="c3-heart"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></span>
+        <div>
+          <p class="c3-eyebrow"><img src="assets/icons/clove-kale.svg" alt="" />Your focus this week</p>
+          <h2 class="c3-focus" id="c3Focus">Iron</h2>
+          <p class="c3-prov" id="c3Prov"><span class="spark">✦</span> Added from your voice note</p>
+        </div>
+      </div>
+      <div class="c3-plate" id="c3Plate"></div>
+      <p class="c3-story" id="c3Story"></p>
+      <div class="c3-stamps" id="c3Stamps"></div>
+    </section>
+
+    <!-- the other goals stay quiet: no rings, no numbers -->
+    <div class="c3-switch" id="c3Switch"></div>
+
+    <div class="gl-plan" id="glPlanWrap">
+      <button class="ai-card" id="glPlan">
+        <span class="ai-card__clove"><span class="mark"><img class="logo" src="assets/icons/clove-white.svg" alt="" /><img class="spark" src="assets/icons/clove-sparkle.svg" alt="" /></span></span>
+        <span class="ai-card__text">
+          <span class="t" id="glPlanT">Plan meals to hit your iron goal</span>
+          <span class="s" id="glPlanS">Health goal: Iron</span>
+        </span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- recipe picker (CardRecipe, Figma 28275:52775) -->
+  <div class="gl-sheet g2-recipes" id="g2Modal" hidden>
+    <div class="gl-sheet__scrim" id="g2ModalScrim"></div>
+    <div class="gl-sheet__card">
+      <div class="gl-sheet__grab"></div>
+      <h2 class="gl-sheet__h" id="g2ModalH">Iron-rich dinners</h2>
+      <p class="gl-sheet__s">Tap a dinner to add it to your week.</p>
+      <div class="g2-rgrid" id="g2Rgrid"></div>
+    </div>
+  </div>
+
+  <!-- "What are you working on?" -->
+  <div class="gl-sheet" id="glSheet" hidden>
+    <div class="gl-sheet__scrim" id="glScrim"></div>
+    <div class="gl-sheet__card">
+      <div class="gl-sheet__grab"></div>
+      <h2 class="gl-sheet__h">What are you working on?</h2>
+      <p class="gl-sheet__s">Clove shapes every suggestion around this.</p>
+      <div class="gl-opts" id="glOpts"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app-lite.js"></script>
+<script src="memory.js"></script>
+<script src="goals.js"></script>
+<script src="plates.js"></script>
+<script src="tracker.js"></script>
+<script>
+  (function () {
+    var T = Tracker, TOTAL = T.TOTAL;
+
+    /* one goal owns the screen; the chips can hand it the focus */
+    var focus = sessionStorage.getItem("c3Focus") || "Iron";
+    function slideFor(label) {
+      var all = T.slides();
+      for (var i = 0; i < all.length; i++) if (all[i].label === label) return all[i];
+      focus = all[0].label;
+      return all[0];
+    }
+    T.cur = function () { return slideFor(focus); };
+
+    /* ---- the plate fills, one portion per cooked dinner ---- */
+    function renderPlate(fresh) {
+      var wrap = document.getElementById("c3Plate");
+      wrap.innerHTML = ClovePlates.svg(focus, 0);
+      if (fresh) { wrap.classList.remove("swap"); void wrap.offsetWidth; wrap.classList.add("swap"); }
+      /* portions land after paint so the transition runs */
+      setTimeout(function () { syncPortions(); }, fresh ? 260 : 60);
+    }
+    function syncPortions() {
+      var n = T.doneCount(focus);
+      document.querySelectorAll("#c3Plate .pp").forEach(function (g, i) {
+        g.classList.toggle("off", i >= n);
+        /* stagger the initial fill */
+        g.style.transitionDelay = g.classList.contains("off") ? "0ms" : (i * 90) + "ms";
+      });
+    }
+
+    function renderStory() {
+      var n = T.doneCount(focus), flavor = T.metaFor(focus).flavor;
+      var el = document.getElementById("c3Story");
+      el.innerHTML = n >= TOTAL
+        ? "<b>All " + TOTAL + "</b> " + flavor + " dinners cooked · week complete"
+        : "<b>" + n + " of " + TOTAL + "</b> " + flavor + " dinners cooked · " + (TOTAL - n) + " to go";
+    }
+
+    /* ---- the week's dinners as small stamps ---- */
+    function renderStamps(popIdx) {
+      var s = T.cur();
+      document.getElementById("c3Stamps").innerHTML = T.slotsFor(focus).map(function (m, i) {
+        if (!m) return '<button class="c3-stamp c3-stamp--add" data-i="' + i + '" aria-label="Add a dinner"></button>';
+        return '<button class="c3-stamp' + (m.done ? " done" : "") + (i === popIdx ? " c3-stamp--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +
+          '<img src="' + m.img + '" alt="" />' +
+          '<span class="c3-stamp__badge" style="background:' + s.color + '"><img src="assets/icons/check-sm.svg" alt="" /></span></button>';
+      }).join("");
+    }
+    document.getElementById("c3Stamps").addEventListener("click", function (e) {
+      var btn = e.target.closest(".c3-stamp");
+      if (!btn) return;
+      var i = Number(btn.dataset.i);
+      var slots = T.slotsFor(focus);
+      if (!slots[i]) { T.openModal(); return; }
+      /* tick a dinner: its badge pops and a fresh portion lands on the plate */
+      slots[i].done = !slots[i].done;
+      T.saveState();
+      btn.classList.toggle("done", slots[i].done);
+      syncPortions();
+      renderStory();
+      if (slots[i].done && T.maybeCelebrate(focus)) {
+        var plate = document.querySelector("#c3Plate .plate-art");
+        plate.classList.remove("celebrate"); void plate.offsetWidth;
+        plate.classList.add("celebrate");
+      }
+    });
+
+    /* ---- head + chips + nudge ---- */
+    function renderHead() {
+      document.getElementById("c3Focus").textContent = focus;
+      document.getElementById("c3Prov").innerHTML = '<span class="spark">✦</span> ' + T.metaFor(focus).prov;
+    }
+    function renderChips() {
+      var others = T.slides().filter(function (s) { return s.label !== focus; });
+      document.getElementById("c3Switch").innerHTML =
+        '<span class="c3-switch__lbl">Also watching:</span>' +
+        others.map(function (s) { return '<button class="c3-chip" data-l="' + s.label + '">' + s.label + "</button>"; }).join("");
+    }
+    document.getElementById("c3Switch").addEventListener("click", function (e) {
+      var chip = e.target.closest(".c3-chip");
+      if (!chip) return;
+      focus = chip.dataset.l;
+      sessionStorage.setItem("c3Focus", focus);
+      render(false, true);
+    });
+    function renderNudge(animate) {
+      document.getElementById("glPlanT").textContent = "Plan meals to hit your " + focus.toLowerCase() + " goal";
+      document.getElementById("glPlanS").textContent = "Health goal: " + focus;
+      var planCard = document.querySelector("#glPlanWrap .ai-card");
+      clearTimeout(planCard._t);
+      if (animate) {
+        planCard.classList.remove("ai-card--reveal");
+        planCard.classList.add("ai-card--wait");
+        planCard._t = setTimeout(function () {
+          planCard.classList.remove("ai-card--wait");
+          planCard.classList.add("ai-card--reveal");
+        }, 1400);
+      } else {
+        planCard.classList.remove("ai-card--wait");
+        planCard.classList.add("ai-card--reveal");
+      }
+    }
+
+    function render(animate, swapping) {
+      renderHead();
+      renderPlate(animate || swapping);
+      renderStory();
+      renderStamps(-1);
+      renderChips();
+      renderNudge(animate);
+    }
+
+    T.onAdd = function (free) { renderStamps(free); };
+    T.bindSheet(function () { render(false, true); });
+    T.bindNudge();
+    render(true, false);
+  })();
+</script>
+</body>
+</html>

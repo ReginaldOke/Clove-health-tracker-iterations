@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="icon" href="data:," />
+<title>Clove - Health goals concepts</title>
+<style>
+  @font-face { font-family: "Acaraje"; font-weight: 400; src: url("assets/fonts/Acaraje-Regular.otf") format("opentype"); }
+  @font-face { font-family: "Acaraje"; font-weight: 500; src: url("assets/fonts/Acaraje-Medium.otf") format("opentype"); }
+  @font-face { font-family: "Acaraje"; font-weight: 600; src: url("assets/fonts/Acaraje-SemiBold.otf") format("opentype"); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #111;
+    color: #fff;
+    font-family: "Acaraje", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+  }
+
+  /* ---- header ---- */
+  .brand {
+    position: fixed;
+    top: 22px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 20;
+    pointer-events: none;
+    text-align: center;
+    padding: 0 16px;
+  }
+  .brand h1 { display: flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+  .brand h1 img { width: 15px; height: 17px; }
+  .brand p { font-size: 12.5px; font-weight: 400; color: rgba(255, 255, 255, 0.45); }
+  .brand .sub-m { display: none; }
+
+  /* ---- stage: the phones ---- */
+  .wrap { height: 100%; display: flex; align-items: center; justify-content: center; }
+  .scale { transform: scale(var(--s, 1)); }
+  .stage { position: relative; width: 402px; height: 874px; }
+  .track { position: absolute; inset: 0; display: flex; gap: 64px; transition: transform 680ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .slot {
+    position: relative;
+    flex: none;
+    width: 402px;
+    height: 874px;
+    border-radius: 46px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 40px 90px rgba(0, 0, 0, 0.55);
+    transition: opacity 520ms ease, transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .slot iframe { width: 402px; height: 874px; border: 0; display: block; background: #fff; }
+  .slot:not(.on) { opacity: 0.22; transform: scale(0.92); }
+  .slot .cover { position: absolute; inset: 0; cursor: pointer; display: none; }
+  .slot:not(.on) .cover { display: block; }
+
+  /* ---- the switcher lives OUTSIDE the phone frame ---- */
+  .nav {
+    position: fixed;
+    top: 50%;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12px;
+    transform: translateY(-50%);
+  }
+  .nav .disc {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav:hover .disc { transform: scale(1.07); }
+  .nav:active .disc { transform: scale(0.92); }
+  .nav .disc img { width: 16px; height: 9px; }
+  .nav--prev { left: calc(50% - var(--edge, 201px) - 110px); }
+  .nav--next { right: calc(50% - var(--edge, 201px) - 110px); }
+  .nav--prev .disc img { transform: rotate(90deg); }
+  .nav--next .disc img { transform: rotate(-90deg); }
+  /* a soft ripple on the next arrow until the first interaction */
+  .nav--next.hint .disc { animation: nudge 2.2s ease 0.8s 3; }
+  .nav--next.hint::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    animation: halo 2.2s ease 0.8s 3;
+    opacity: 0;
+    pointer-events: none;
+  }
+  @keyframes nudge { 0%, 100% { transform: none; } 12% { transform: translateX(7px); } 24% { transform: none; } }
+  @keyframes halo { 0% { opacity: 0.8; transform: scale(1); } 45% { opacity: 0; transform: scale(1.75); } 100% { opacity: 0; } }
+
+  /* ---- legend: which concept am I looking at ---- */
+  .legend {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    z-index: 20;
+    pointer-events: none;
+    text-align: center;
+    padding: 0 16px;
+  }
+  .dots { display: flex; gap: 7px; }
+  .dots i { width: 6px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.22); transition: background 240ms ease, transform 240ms ease; }
+  .dots i.on { background: #fff; transform: scale(1.25); }
+  .legend h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
+  .legend h2 span { color: rgba(255, 255, 255, 0.4); font-weight: 400; }
+  .legend p { font-size: 12.5px; color: rgba(255, 255, 255, 0.45); max-width: 420px; line-height: 1.45; }
+
+  /* ---- mobile: vertical deck ---- */
+  @media (max-width: 760px) {
+    .track { flex-direction: column; }
+    .nav { top: auto; transform: none; }
+    .nav--prev { left: auto; right: 14px; bottom: 96px; }
+    .nav--next { right: 14px; bottom: 30px; }
+    .nav--prev .disc, .nav--next .disc { width: 46px; height: 46px; }
+    .nav--prev .disc img { transform: rotate(180deg); }
+    .nav--next .disc img { transform: rotate(0deg); }
+    .nav--next.hint::after { width: 46px; height: 46px; }
+    @keyframes nudge { 0%, 100% { transform: none; } 12% { transform: translateY(7px); } 24% { transform: none; } }
+    .nav span { display: none; }
+    .brand { top: 12px; }
+    .brand .sub-d { display: none; }
+    .brand .sub-m { display: block; }
+    .legend { bottom: 0; padding: 34px 18px 14px; align-items: flex-start; text-align: left;
+      background: linear-gradient(180deg, rgba(17, 17, 17, 0) 0%, rgba(17, 17, 17, 0.92) 55%); }
+    .legend p { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <h1><img src="assets/icons/clove-white.svg" alt="" />Health goals</h1>
+  <p class="sub-d">Three concepts for the Clove tracker · every screen is live, go ahead and tap around</p>
+  <p class="sub-m">Three live concepts · every screen works</p>
+</header>
+
+<button class="nav nav--prev" id="navPrev" aria-label="Previous concept"><span class="disc"><img src="assets/icons/chevron-rt.svg" alt="" /></span></button>
+<button class="nav nav--next hint" id="navNext" aria-label="Next concept"><span class="disc"><img src="assets/icons/chevron-rt.svg" alt="" /></span></button>
+
+<div class="wrap">
+  <div class="scale" id="scale">
+    <div class="stage">
+      <div class="track" id="track">
+        <div class="slot on"><iframe src="concept-1.html" title="Concept 1"></iframe><div class="cover"></div></div>
+        <div class="slot"><iframe src="concept-2.html" title="Concept 2"></iframe><div class="cover"></div></div>
+        <div class="slot"><iframe src="concept-3.html" title="Concept 3"></iframe><div class="cover"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="legend">
+  <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
+  <h2><span id="cnum">1 of 3</span> &nbsp;<b id="cname">The dressed plate</b></h2>
+  <p id="cdesc">Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it.</p>
+</footer>
+
+<script>
+  (function () {
+    var CONCEPTS = [
+      { name: "The dressed plate", desc: "Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it." },
+      { name: "The clean plate", desc: "The calmest dial: the number rests on an empty plate with the cutlery set, week chart front and centre." },
+      { name: "Fill your plate", desc: "One clear focus, no numbers. The plate fills with food as the week gets cooked; the other goals wait quietly as chips." },
+    ];
+    var i = Math.min(2, Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+    var track = document.getElementById("track");
+    var slots = track.children;
+    var vertical = false;
+
+    function layout() {
+      vertical = window.innerWidth <= 760;
+      var s = vertical
+        ? Math.min((window.innerWidth - 24) / 402, (window.innerHeight - 185) / 874)
+        : Math.min(1, (window.innerWidth - 340) / 402, (window.innerHeight - 190) / 874);
+      document.getElementById("scale").style.setProperty("--s", s);
+      /* park the chevrons just outside the scaled phone edge */
+      document.body.style.setProperty("--edge", (201 * s) + "px");
+      go(i, true);
+    }
+    function go(n, instant) {
+      i = (n + CONCEPTS.length) % CONCEPTS.length;
+      var step = 402 + 64, stepY = 874 + 64;
+      if (instant) track.style.transition = "none";
+      track.style.transform = vertical ? "translateY(" + (-i * stepY) + "px)" : "translateX(" + (-i * step) + "px)";
+      if (instant) { void track.offsetWidth; track.style.transition = ""; }
+      for (var k = 0; k < slots.length; k++) slots[k].classList.toggle("on", k === i);
+      document.querySelectorAll("#dots i").forEach(function (d, k) { d.classList.toggle("on", k === i); });
+      document.getElementById("cnum").textContent = (i + 1) + " of 3";
+      document.getElementById("cname").textContent = CONCEPTS[i].name;
+      document.getElementById("cdesc").textContent = CONCEPTS[i].desc;
+      history.replaceState(null, "", "#" + (i + 1));
+    }
+    function unhint() { document.getElementById("navNext").classList.remove("hint"); }
+
+    document.getElementById("navNext").addEventListener("click", function () { unhint(); go(i + 1); });
+    document.getElementById("navPrev").addEventListener("click", function () { unhint(); go(i - 1); });
+    Array.prototype.forEach.call(document.querySelectorAll(".cover"), function (c, k) {
+      c.addEventListener("click", function () { unhint(); go(Array.prototype.indexOf.call(slots, c.parentNode)); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { unhint(); go(i + 1); }
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") { unhint(); go(i - 1); }
+    });
+
+    /* swipe on the dark stage (and the dimmed phones) */
+    var t0 = null;
+    document.addEventListener("touchstart", function (e) {
+      t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+    document.addEventListener("touchend", function (e) {
+      if (!t0) return;
+      var dx = e.changedTouches[0].clientX - t0.x, dy = e.changedTouches[0].clientY - t0.y;
+      t0 = null;
+      if (vertical ? Math.abs(dy) > 60 : Math.abs(dx) > 60) {
+        unhint();
+        go(i + ((vertical ? dy : dx) < 0 ? 1 : -1));
+      }
+    }, { passive: true });
+
+    window.addEventListener("resize", layout);
+    layout();
+  })();
+</script>
+</body>
+</html>
