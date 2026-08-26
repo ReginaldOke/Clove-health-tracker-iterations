@@ -43,7 +43,7 @@
       </section>
 
       <section class="g2-goal">
-        <p class="g3-goalline" id="g2GoalLine">Goal: 2/5 iron-rich dinners</p>
+        <p class="g3-goalline" id="g2GoalLine">Goal: 2/5 iron-rich meals</p>
         <div class="g3-cards" id="g3Cards"></div>
       </section>
 
@@ -156,7 +156,7 @@
     /* ---- cooked-meal cards + one add tile ---- */
     function setGoalLine() {
       var s = T.cur();
-      document.getElementById("g2GoalLine").textContent = "Goal: " + T.doneCount(s.label) + "/" + TOTAL + " " + T.metaFor(s.label).flavor + " dinners";
+      document.getElementById("g2GoalLine").textContent = "Goal: " + T.doneCount(s.label) + "/" + TOTAL + " " + T.metaFor(s.label).flavor + " meals";
     }
     function renderMeals(popIdx) {
       var s = T.cur(), slots = T.slotsFor(s.label);

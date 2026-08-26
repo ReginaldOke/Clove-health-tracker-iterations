@@ -34,10 +34,9 @@
         { t: "Roast chicken", img: R + "roast-chicken.webp", time: "1 hr 20" },
       ],
       slots: [
-        { img: R + "roast-chicken.webp", t: "Roast chicken", done: true },
-        { img: R + "kale-caesar.webp", t: "Kale Caesar salad", done: true },
+        { img: R + "chicken-bake.webp", t: "Chicken bake", done: true },
         { img: R + "white-beans.webp", t: "Beans in olive oil", done: true },
-        null, null,
+        null, null, null,
       ],
     },
     Fibre: {
@@ -50,11 +49,9 @@
         { t: "Weeknight stir fry", img: R + "stirfry.webp", time: "20 min" },
       ],
       slots: [
+        { img: R + "greens.webp", t: "Braised greens & lemon", done: true },
         { img: R + "grain-bowl.webp", t: "Grain bowl", done: true },
-        { img: R + "stirfry.webp", t: "Weeknight stir fry", done: true },
-        { img: R + "cauliflower-bowl.webp", t: "Cauliflower bowl", done: true },
-        { img: R + "white-beans.webp", t: "Beans in olive oil", done: true },
-        null,
+        null, null, null,
       ],
     },
   };
@@ -68,7 +65,8 @@
   }
 
   /* ---- per-goal dinner slots, shared by all three concepts ---- */
-  var SKEY = "cloveGoals2V2";
+  var SKEY = "cloveGoals2V3";
+  localStorage.removeItem("cloveGoals2V2");
   var state = (function () {
     try { var s = JSON.parse(localStorage.getItem(SKEY) || "null"); if (s && s.goals) return s; } catch (e) {}
     return { goals: {} };
@@ -474,7 +472,8 @@
     var dinnerWorth = 0.55 * goalN;
     var nowN = T.doneCount(s.label) * dinnerWorth;
     var unit = s.unit || r.unit || String(r.goal).replace(/[\d.,\s]/g, "");
-    var weekPct = [0.31, 0.35, 0.28, 0, 0, 0, 0];
+    var SHAPES = { Iron: [0.22, 0.31, 0.24], Protein: [0.42, 0.27, 0.38], Fibre: [0.3, 0.45, 0.26] };
+    var weekPct = (SHAPES[s.label] || [0.34, 0.26, 0.37]).concat([0, 0, 0, 0]);
     var W = Math.round(svg.clientWidth) || 320, H = Math.round(svg.clientHeight) || 84, PAD = 8, run = 0, cum = [];
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");

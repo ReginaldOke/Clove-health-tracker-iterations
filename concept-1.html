@@ -35,7 +35,7 @@
     <div class="g2-below" id="g2Below">
 
       <section class="g2-goal">
-        <p class="g2-goalline" id="g2GoalLine">Goal: Eat 5 iron-rich dinners</p>
+        <p class="g2-goalline" id="g2GoalLine">Goal: Eat 5 iron-rich meals</p>
         <div class="g2-meals" id="g2Meals"></div>
       </section>
 
@@ -148,7 +148,7 @@
     /* ---- meal circles ---- */
     function renderMeals(popIdx) {
       var s = T.cur();
-      document.getElementById("g2GoalLine").textContent = "Goal: Eat " + TOTAL + " " + T.metaFor(s.label).flavor + " dinners";
+      document.getElementById("g2GoalLine").textContent = "Goal: Eat " + TOTAL + " " + T.metaFor(s.label).flavor + " meals";
       document.getElementById("g2Meals").innerHTML = T.slotsFor(s.label).map(function (m, i) {
         if (!m) return '<button class="g2-meal g2-meal--empty" data-i="' + i + '" aria-label="Add a dinner"></button>';
         return '<button class="g2-meal' + (m.done ? " done" : " g2-meal--planned") + (i === popIdx ? " g2-meal--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +

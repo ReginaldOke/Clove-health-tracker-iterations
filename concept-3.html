@@ -103,35 +103,58 @@
       "var(--paprika-300)": { soft: "var(--paprika-100)", solid: "var(--paprika-300)" },
     };
 
-    /* the chart mirrors the goal section: the goal-rich bars ARE the five
-       dinners below, in the same order (slots fill chart positions M, T, F);
-       two everyday meals stay put, the rest are nights off */
-    var RICH_POS = [0, 3, 4];
+    /* ONE shared week of meals: the images never change between goals,
+       only which days stand tall. Monday's Caesar is iron-rich but light
+       on protein; Tuesday's chicken bake is the protein day, and so on.
+       Meals added below fill the empty days (Sunday first, then
+       Wednesday) with a bar in the colour of the goal they were added
+       under. */
+    var WEEK_IMGS = [
+      R + "kale-caesar.webp",
+      R + "chicken-bake.webp",
+      null,
+      R + "greens.webp",
+      R + "white-beans.webp",
+      R + "grain-bowl.webp",
+      null,
+    ];
+    var EMPTY_POS = [6, 2];
     var CHART = {
-      Iron: {
-        unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, richVals: [9.2, 8.4, 8.8],
-        others: [{ pos: 1, img: R + "creamy-pasta.webp", v: 2.1 }, { pos: 5, img: R + "greek-salad.webp", v: 1.8 }],
-      },
-      Protein: {
-        unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, richVals: [52, 46, 55],
-        others: [{ pos: 1, img: R + "greek-salad.webp", v: 14 }, { pos: 5, img: R + "creamy-pasta.webp", v: 18 }],
-      },
-      Fibre: {
-        unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, richVals: [13.5, 12.8, 14.2],
-        others: [{ pos: 1, img: R + "cucumber-salad.webp", v: 3.2 }, { pos: 5, img: R + "baked-pasta.webp", v: 5.1 }],
-      },
+      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [9.2, 2.4, 0, 8.4, 6.8, 3.1, 0], rich: [0, 3] },
+      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [14, 52, 0, 12, 43, 22, 0], rich: [1, 4] },
+      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [6.5, 3.8, 0, 13.2, 8.2, 14.1, 0], rich: [3, 5] },
     };
     function chartFor(s) {
       if (CHART[s.label]) return CHART[s.label];
       var x = T.EXTRAS[s.label];
-      if (x) return { unit: x.unit, unitLabel: x.chart.unitLabel, goal: x.chart.goal, yMax: x.chart.yMax, richVals: x.chart.richVals, others: [] };
+      if (x) {
+        var g = x.chart.goal;
+        return {
+          unit: x.unit, unitLabel: x.chart.unitLabel, goal: g, yMax: x.chart.yMax,
+          vals: [0.52, 0.58, 0, 0.47, 0.62, 0.5, 0].map(function (f) { return Math.round(f * g * 10) / 10; }),
+          rich: [],
+        };
+      }
       return CHART.Iron;
     }
     function daysFor(s, c) {
-      var days = [null, null, null, null, null, null, null];
-      c.others.forEach(function (o) { days[o.pos] = { img: o.img, v: o.v }; });
-      T.slotsFor(s.label).filter(Boolean).slice(0, 3).forEach(function (m, k) {
-        days[RICH_POS[k]] = { img: m.img, v: c.richVals[k], rich: true };
+      var days = WEEK_IMGS.map(function (img, i) {
+        return img ? { img: img, v: c.vals[i], rich: c.rich.indexOf(i) > -1 } : null;
+      });
+      /* meals added in ANY goal land on the same shared days, coloured by
+         the goal they serve */
+      var added = [];
+      T.slides().forEach(function (sl) {
+        T.slotsFor(sl.label).slice(2).filter(Boolean).forEach(function (m) {
+          added.push({ m: m, own: sl.label === s.label });
+        });
+      });
+      added.slice(0, EMPTY_POS.length).forEach(function (a, k) {
+        days[EMPTY_POS[k]] = {
+          img: a.m.img,
+          v: Math.round((a.own ? c.goal * 1.12 : c.goal * 0.45) * 10) / 10,
+          rich: a.own,
+        };
       });
       return days;
     }
