@@ -210,8 +210,8 @@ body.c1 .gl-week { margin: 14px 0; }
 body.b3 .gl-body { gap: 20px; }
 
 /* goal switcher: < Iron goal > */
-.b3-switch { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 2px; }
-.b3-switch h2 { min-width: 150px; text-align: center; font-size: 20px; font-weight: 600; letter-spacing: -0.2px; color: var(--black-500); }
+.b3-switch { display: flex; align-items: center; justify-content: flex-start; gap: 12px; margin-top: 2px; }
+.b3-switch h2 { min-width: 128px; text-align: left; font-size: 20px; font-weight: 600; letter-spacing: -0.2px; color: var(--black-500); order: -1; }
 .b3-chev {
   flex: none;
   display: flex;

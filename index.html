@@ -75,6 +75,7 @@
   .nav:hover .disc { transform: scale(1.08); background: rgba(255, 255, 255, 0.16); }
   .nav:active .disc { transform: scale(0.9); }
   .nav .disc img { width: 14px; height: 8px; filter: invert(1); opacity: 0.8; }
+  .nav__lbl { display: none; font-size: 12.5px; color: rgba(255, 255, 255, 0.75); white-space: nowrap; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
   .nav--prev { left: calc(50% - var(--edge, 201px) - 110px); }
   .nav--next { right: calc(50% - var(--edge, 201px) - 110px); }
   .nav--prev .disc img { transform: rotate(90deg); }
@@ -114,20 +115,23 @@
   }
   .legend p { font-size: 12.5px; color: rgba(255, 255, 255, 0.45); max-width: 420px; line-height: 1.45; }
 
-  /* ---- mobile: vertical deck ---- */
+  /* ---- mobile: vertical deck, no legend text, a labelled next chevron ---- */
   @media (max-width: 760px) {
     .track { flex-direction: column; }
     .nav { top: auto; transform: none; }
     .nav--prev { left: auto; right: 14px; bottom: 96px; }
-    .nav--next { right: 14px; bottom: 30px; }
+    .nav--next { right: 14px; bottom: 30px; flex-direction: row; gap: 10px; }
     .nav--prev .disc img { transform: rotate(180deg); }
     .nav--next .disc img { transform: rotate(0deg); }
+    .nav__lbl { display: block; }
+    .legend { display: none; }
+  }
   </style>
 </head>
 <body>
 
 <button class="nav nav--prev" id="navPrev" aria-label="Previous concept"><span class="disc"><img src="assets/icons/chevron-rt.svg" alt="" /></span></button>
-<button class="nav nav--next hint" id="navNext" aria-label="Next concept"><span class="disc"><img src="assets/icons/chevron-rt.svg" alt="" /></span></button>
+<button class="nav nav--next hint" id="navNext" aria-label="Next concept"><span class="nav__lbl">Next prototype</span><span class="disc"><img src="assets/icons/chevron-rt.svg" alt="" /></span></button>
 
 <div class="wrap">
   <div class="scale" id="scale">
