@@ -17,6 +17,28 @@
   transform: translate(-50%, -50%);
 }
 .plate-chart > img, .plate-chart .lip-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* concept A: the plate you are on grows to own the centre, its
+   neighbours tuck in smaller */
+body.c1 .plate-chart {
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(-50%, -50%) scale(0.8);
+}
+body.c1 .g2-slide.on .plate-chart { transform: translate(-50%, -50%) scale(1.14); }
+/* a pulse variant that keeps the plate centred */
+.plate-chart.celebrate { animation-name: c-pulse-center; }
+@keyframes c-pulse-center {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  30% { transform: translate(-50%, -50%) scale(1.05) rotate(-2deg); }
+  60% { transform: translate(-50%, -50%) scale(1.02) rotate(2deg); }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+}
+body.c1 .g2-slide.on .plate-chart.celebrate { animation-name: c-pulse-center-big; }
+@keyframes c-pulse-center-big {
+  0% { transform: translate(-50%, -50%) scale(1.14) rotate(0deg); }
+  30% { transform: translate(-50%, -50%) scale(1.2) rotate(-2deg); }
+  60% { transform: translate(-50%, -50%) scale(1.16) rotate(2deg); }
+  100% { transform: translate(-50%, -50%) scale(1.14) rotate(0deg); }
+}
 
 /* the goal label gets its own band above the plates, so swiping plates
    never slides under the text */
@@ -31,7 +53,7 @@ body.c1 .g2-hero__meta, .g3 .g2-hero__meta {
   order: -1;
   padding: 14px 16px 0;
 }
-body.c1 .g2-carousel { height: 176px; }
+body.c1 .g2-carousel { height: 192px; }
 .g3 .g2-carousel { height: 182px; }
 body.c1 .g2-dots, .g3 .g2-dots { position: static; margin-top: 2px; }
 
@@ -161,18 +183,19 @@ body.c1 .gl-week { margin: 14px 0; }
 .g3 .g2-carousel { position: relative; z-index: 2; }
 /* landing on a plate: the cutlery glows the ring's colour and leans in,
    the way a knife and fork move toward a meal */
+.g3 .g3-cutlery { transform-origin: 50% 100%; }
 .g3-cutlery.cue { animation: cue-fork 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1; }
 .g3-cutlery--knife.cue { animation-name: cue-knife; }
 @keyframes cue-fork {
   0% { transform: none; filter: none; }
-  32% { transform: translateX(7px) rotate(-3deg); filter: drop-shadow(0 0 7px var(--cue, #bd53ea)); }
-  64% { transform: translateX(2px); filter: drop-shadow(0 0 3px var(--cue, #bd53ea)); }
+  32% { transform: rotate(8deg) translateX(2px); filter: drop-shadow(0 0 7px var(--cue, #bd53ea)); }
+  64% { transform: rotate(3deg); filter: drop-shadow(0 0 3px var(--cue, #bd53ea)); }
   100% { transform: none; filter: none; }
 }
 @keyframes cue-knife {
   0% { transform: none; filter: none; }
-  32% { transform: translateX(-7px) rotate(3deg); filter: drop-shadow(0 0 7px var(--cue, #bd53ea)); }
-  64% { transform: translateX(-2px); filter: drop-shadow(0 0 3px var(--cue, #bd53ea)); }
+  32% { transform: rotate(-8deg) translateX(-2px); filter: drop-shadow(0 0 7px var(--cue, #bd53ea)); }
+  64% { transform: rotate(-3deg); filter: drop-shadow(0 0 3px var(--cue, #bd53ea)); }
   100% { transform: none; filter: none; }
 }
 
@@ -216,6 +239,7 @@ body.b3 .gl-body { gap: 20px; }
 .b3-num b { font-size: 40px; font-weight: 600; letter-spacing: -0.8px; line-height: 1; color: var(--black-500); }
 .b3-num span { font-size: 16px; font-weight: 400; color: var(--black-400); }
 .b3-range { margin-top: 6px; font-size: 13px; color: var(--black-400); }
+.b3-range b { font-weight: 600; color: var(--kale-500); }
 
 /* ---- the week chart ---- */
 .b3-chart { position: relative; padding-right: 46px; margin-top: 2px; }

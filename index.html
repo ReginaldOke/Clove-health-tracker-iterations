@@ -169,7 +169,12 @@
       go(i, true);
     }
     function go(n, instant) {
+      var prev = i;
       i = (n + CONCEPTS.length) % CONCEPTS.length;
+      /* arriving at a concept replays its entrance: rings draw, bars grow */
+      if (!instant && i !== prev) {
+        try { slots[i].querySelector("iframe").contentWindow.location.reload(); } catch (e) {}
+      }
       var step = 402 + 64, stepY = 874 + 64;
       if (instant) track.style.transition = "none";
       track.style.transform = vertical ? "translateY(" + (-i * stepY) + "px)" : "translateX(" + (-i * step) + "px)";

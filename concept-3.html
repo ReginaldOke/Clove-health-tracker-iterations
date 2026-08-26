@@ -34,7 +34,7 @@
       <div class="b3-stat">
         <p class="b3-eyebrow">Daily average</p>
         <p class="b3-num"><b id="b3Avg">0</b><span id="b3Unit">mg iron</span></p>
-        <p class="b3-range">This week · 20 to 26 Aug</p>
+        <p class="b3-range" id="b3Range"><b>+6%</b> on last week</p>
       </div>
 
       <!-- the week, one bar and one plate per day -->
@@ -120,9 +120,9 @@
     ];
     var EMPTY_POS = [6, 2];
     var CHART = {
-      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [9.2, 2.4, 0, 8.4, 6.8, 3.1, 0], rich: [0, 3] },
-      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [14, 52, 0, 12, 43, 22, 0], rich: [1, 4] },
-      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [6.5, 3.8, 0, 13.2, 8.2, 14.1, 0], rich: [3, 5] },
+      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [9.2, 2.4, 0, 8.4, 6.8, 3.1, 0], rich: [0, 3], delta: "+6%" },
+      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [14, 52, 0, 12, 43, 22, 0], rich: [1, 4], delta: "+11%" },
+      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [6.5, 3.8, 0, 13.2, 8.2, 14.1, 0], rich: [3, 5], delta: "+3%" },
     };
     function chartFor(s) {
       if (CHART[s.label]) return CHART[s.label];
@@ -133,6 +133,7 @@
           unit: x.unit, unitLabel: x.chart.unitLabel, goal: g, yMax: x.chart.yMax,
           vals: [0.52, 0.58, 0, 0.47, 0.62, 0.5, 0].map(function (f) { return Math.round(f * g * 10) / 10; }),
           rich: [],
+          delta: "New this week",
         };
       }
       return CHART.Iron;
@@ -182,6 +183,7 @@
       var avg = cooked.length ? cooked.reduce(function (a, d) { return a + d.v; }, 0) / cooked.length : 0;
       document.getElementById("b3Avg").textContent = fmt(avg);
       document.getElementById("b3Unit").textContent = c.unitLabel;
+      document.getElementById("b3Range").innerHTML = c.delta.charAt(0) === "+" ? "<b>" + c.delta + "</b> on last week" : c.delta;
       /* gridlines at max and midway, the goal as a dotted colour line */
       var H = 190;
       function yTop(v) { return (1 - v / c.yMax) * H; }

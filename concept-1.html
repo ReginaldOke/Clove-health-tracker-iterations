@@ -120,6 +120,7 @@
       }).join("");
       document.getElementById("g2Dots").innerHTML = T.slides().map(function () { return "<i></i>"; }).join("");
       active = Math.max(0, Math.min(T.slides().length - 1, Math.round(car.scrollLeft / PITCH)));
+      markActive();
       setMeta(active, animate && active === 0);
       if (animate) setTimeout(function () { G.playRings(car); }, 150);
     }
@@ -131,10 +132,16 @@
       arc.style.transition = "stroke-dasharray 900ms cubic-bezier(.25,1,.35,1)";
       arc.setAttribute("stroke-dasharray", (T.cur().pct * C).toFixed(1) + " " + C.toFixed(1));
     }
+    function markActive() {
+      document.querySelectorAll("#g2Car .g2-slide").forEach(function (sl, k) {
+        sl.classList.toggle("on", k === active);
+      });
+    }
     document.getElementById("g2Car").addEventListener("scroll", function () {
       var i = Math.max(0, Math.min(T.slides().length - 1, Math.round(this.scrollLeft / PITCH)));
       if (i === active) return;
       active = i;
+      markActive();
       setMeta(i, false);
       var below = document.getElementById("g2Below");
       below.classList.add("g2-below--fade");

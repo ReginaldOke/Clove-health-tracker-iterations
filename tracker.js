@@ -77,8 +77,11 @@
   }
   function saveState() { localStorage.setItem(SKEY, JSON.stringify(state)); }
   function doneCount(label) { return slotsFor(label).filter(function (s) { return s && s.done; }).length; }
-  /* dinners, not milligrams: each ticked dinner is worth ~19% of the ring */
-  function pctFor(label) { return Math.min(0.96, 0.19 * doneCount(label)); }
+  /* dinners, not milligrams: each ticked dinner is worth ~19% of the ring.
+     Everyday meals chip in a per-goal baseline, so the three rings sit at
+     different fills (38 / 50 / 64) instead of matching. */
+  var PCT_BASE = { Protein: 0.12, Fibre: 0.26 };
+  function pctFor(label) { return Math.min(0.96, (PCT_BASE[label] || 0) + 0.19 * doneCount(label)); }
   /* the deck's own dressing over goals.js: the third ring is FIBRE here
      (not Energy), and ring colours follow the plate's food:
      egg = orange, salad = green */
