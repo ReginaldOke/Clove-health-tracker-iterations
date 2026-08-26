@@ -19,9 +19,6 @@
   <main class="gl-body" id="glBody">
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
-      <button class="gl-edit" id="glEdit" aria-label="Edit health goals">
-        <span class="ico ico-20"><img src="assets/icons/pencil.svg" alt="" style="width:16px;height:16px" /></span>
-      </button>
     </div>
 
     <!-- < Iron goal > : the chevrons walk through the tracked goals -->
@@ -106,46 +103,38 @@
       "var(--paprika-300)": { soft: "var(--paprika-100)", solid: "var(--paprika-300)" },
     };
 
-    /* one week of dinners per goal: three recommended goal-rich meals
-       past the dotted goal line, two everyday meals, two nights off */
+    /* the chart mirrors the goal section: the goal-rich bars ARE the five
+       dinners below, in the same order (slots fill chart positions M, T, F);
+       two everyday meals stay put, the rest are nights off */
+    var RICH_POS = [0, 3, 4];
     var CHART = {
       Iron: {
-        unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12,
-        days: [
-          { img: R + "short-ribs.webp", v: 9.2, rich: true },
-          { img: R + "creamy-pasta.webp", v: 2.1 },
-          null,
-          { img: R + "greens.webp", v: 8.4, rich: true },
-          { img: R + "white-beans.webp", v: 8.8, rich: true },
-          { img: R + "greek-salad.webp", v: 1.8 },
-          null,
-        ],
+        unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, richVals: [9.2, 8.4, 8.8],
+        others: [{ pos: 1, img: R + "creamy-pasta.webp", v: 2.1 }, { pos: 5, img: R + "greek-salad.webp", v: 1.8 }],
       },
       Protein: {
-        unit: "g", unitLabel: "g protein", goal: 40, yMax: 60,
-        days: [
-          { img: R + "chicken-bake.webp", v: 52, rich: true },
-          { img: R + "greek-salad.webp", v: 14 },
-          null,
-          { img: R + "drumsticks.webp", v: 46, rich: true },
-          { img: R + "roast-chicken.webp", v: 55, rich: true },
-          { img: R + "creamy-pasta.webp", v: 18 },
-          null,
-        ],
+        unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, richVals: [52, 46, 55],
+        others: [{ pos: 1, img: R + "greek-salad.webp", v: 14 }, { pos: 5, img: R + "creamy-pasta.webp", v: 18 }],
       },
       Fibre: {
-        unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18,
-        days: [
-          { img: R + "rice-bowl.webp", v: 13.5, rich: true },
-          { img: R + "cucumber-salad.webp", v: 3.2 },
-          null,
-          { img: R + "stirfry.webp", v: 12.8, rich: true },
-          { img: R + "charred-broccoli.webp", v: 14.2, rich: true },
-          { img: R + "baked-pasta.webp", v: 5.1 },
-          null,
-        ],
+        unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, richVals: [13.5, 12.8, 14.2],
+        others: [{ pos: 1, img: R + "cucumber-salad.webp", v: 3.2 }, { pos: 5, img: R + "baked-pasta.webp", v: 5.1 }],
       },
     };
+    function chartFor(s) {
+      if (CHART[s.label]) return CHART[s.label];
+      var x = T.EXTRAS[s.label];
+      if (x) return { unit: x.unit, unitLabel: x.chart.unitLabel, goal: x.chart.goal, yMax: x.chart.yMax, richVals: x.chart.richVals, others: [] };
+      return CHART.Iron;
+    }
+    function daysFor(s, c) {
+      var days = [null, null, null, null, null, null, null];
+      c.others.forEach(function (o) { days[o.pos] = { img: o.img, v: o.v }; });
+      T.slotsFor(s.label).filter(Boolean).slice(0, 3).forEach(function (m, k) {
+        days[RICH_POS[k]] = { img: m.img, v: c.richVals[k], rich: true };
+      });
+      return days;
+    }
     var LETTERS = ["M", "T", "W", "T", "F", "S", "S"], TODAY = 3;
     function fmt(n) { return (Math.round(n * 10) / 10).toLocaleString(); }
 
@@ -161,12 +150,13 @@
 
     /* ---- the chart ---- */
     function renderChart() {
-      var s = T.cur(), c = CHART[s.label] || CHART.Iron;
+      var s = T.cur(), c = chartFor(s);
+      var days = daysFor(s, c);
       var tone = TONE[s.color] || TONE["var(--eggplant-300)"];
       document.getElementById("b3Title").textContent = s.label + " goal";
       /* stat: the average over the days you cooked */
-      var cooked = c.days.filter(Boolean);
-      var avg = cooked.reduce(function (a, d) { return a + d.v; }, 0) / cooked.length;
+      var cooked = days.filter(Boolean);
+      var avg = cooked.length ? cooked.reduce(function (a, d) { return a + d.v; }, 0) / cooked.length : 0;
       document.getElementById("b3Avg").textContent = fmt(avg);
       document.getElementById("b3Unit").textContent = c.unitLabel;
       /* gridlines at max and midway, the goal as a dotted colour line */
@@ -178,7 +168,7 @@
         '<div class="b3-line b3-line--base" style="top:' + H + 'px"><span class="b3-line__lbl">0</span></div>' +
         '<div class="b3-goal" style="top:' + yTop(c.goal).toFixed(1) + "px;color:" + tone.solid + '"><span class="b3-goal__lbl">Goal ' + fmt(c.goal) + c.unit + "</span></div>";
       /* one column per day: bar, plate, letter */
-      document.getElementById("b3Cols").innerHTML = c.days.map(function (d, i) {
+      document.getElementById("b3Cols").innerHTML = days.map(function (d, i) {
         var bar = "", thumb;
         if (d) {
           bar = '<div class="b3-bar' + (d.rich ? " b3-bar--rich" : "") + '" style="--d:' + (i * 60) + "ms;height:" + ((d.v / c.yMax) * 100).toFixed(1) + "%;--tone:" + tone.solid + ";--tone-soft:" + tone.soft + '"></div>';
@@ -197,7 +187,7 @@
       document.getElementById("g2GoalLine").textContent = "Goal: Eat " + TOTAL + " " + T.metaFor(s.label).flavor + " dinners";
       document.getElementById("g2Meals").innerHTML = T.slotsFor(s.label).map(function (m, i) {
         if (!m) return '<button class="g2-meal g2-meal--empty" data-i="' + i + '" aria-label="Add a dinner"></button>';
-        return '<button class="g2-meal' + (m.done ? " done" : " g2-meal--planned") + (i === popIdx ? " g2-meal--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +
+        return '<button class="g2-meal' + (m.done ? " done" : " g2-meal--planned") + (i === popIdx ? " g2-meal--in" : "") + '" data-i="' + i + '" style="--tone:' + T.cur().color + '" aria-label="' + m.t + '">' +
           '<img src="' + m.img + '" alt="" />' +
           (m.done
             ? '<span class="g2-meal__badge" style="background:' + T.cur().color + '"><img src="assets/icons/check-sm.svg" alt="" /></span>'
@@ -265,8 +255,20 @@
       renderNudge(animate);
     }
 
-    T.onAdd = function (free) { renderMeals(free); };
-    T.onMealChange = function () { renderMeals(-1); };
+    T.onAdd = function (free) { renderMeals(free); renderChart(); };
+    T.onMealChange = function (kind) { renderMeals(-1); if (kind === "remove") renderChart(); };
+    T.onGoalAdded = function (label) {
+      focus = label;
+      sessionStorage.setItem("b3Focus", focus);
+      var body = document.getElementById("b3Body");
+      body.classList.add("b3-body--fade");
+      setTimeout(function () {
+        renderChart();
+        renderMeals(-1);
+        renderNudge(false);
+        body.classList.remove("b3-body--fade");
+      }, 150);
+    };
     T.bindLongPress(document.getElementById("g2Meals"), function (i) { T.openMealSheet(i); });
     T.bindSheet(function () { render(false); });
     T.bindNudge();

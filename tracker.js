@@ -89,12 +89,62 @@
     Energy: { label: "Fibre", color: "var(--kale-300)", track: "var(--kale-100)", goalN: 30, unit: "g" },
   };
   function slides() {
-    return G.rings().map(function (r) {
+    var base = G.rings().map(function (r) {
       var o = RING_OVERRIDE[r.label] || {};
       var label = o.label || r.label;
       return { label: label, pct: pctFor(label), color: o.color || r.color, track: o.track || r.track, goalN: o.goalN, unit: o.unit, ring: r };
     });
+    extras.forEach(function (lbl) {
+      var a = EXTRAS[lbl];
+      if (a) base.push({ label: a.label, pct: pctFor(a.label), color: a.color, track: a.track, goalN: a.goalN, unit: a.unit, ring: null });
+    });
+    return base;
   }
+
+  /* goals the Ask Clove bar can add: full dressing so a described goal
+     arrives as a complete plate of its own */
+  var ADDABLE = [
+    {
+      label: "B12", phrase: "I think I need more B12", toast: "Health goal: More B12",
+      color: "var(--eggplant-300)", track: "var(--eggplant-100)", goalN: 2.4, unit: "mcg",
+      chart: { goal: 1.2, yMax: 2.4, unitLabel: "mcg B12", richVals: [1.6, 1.4, 1.7] },
+      meta: {
+        flavor: "B12-rich", prov: "You told Clove just now",
+        recipes: [
+          { t: "Roast chicken", img: R + "roast-chicken.webp", time: "1 hr 20" },
+          { t: "Fish in tomato", img: R + "fish-tomato.webp", time: "35 min" },
+          { t: "Drumsticks", img: R + "drumsticks.webp", time: "50 min" },
+          { t: "Chicken bake", img: R + "chicken-bake.webp", time: "45 min" },
+        ],
+        slots: [null, null, null, null, null],
+      },
+    },
+    {
+      label: "Cholesterol", phrase: "Keep an eye on my cholesterol", toast: "Health goal: Happier cholesterol",
+      color: "var(--kale-300)", track: "var(--kale-100)", goalN: 10, unit: "g",
+      chart: { goal: 6, yMax: 9, unitLabel: "g wholegrains", richVals: [7.2, 6.8, 7.5] },
+      meta: {
+        flavor: "heart-friendly", prov: "You told Clove just now",
+        recipes: [
+          { t: "Grain bowl", img: R + "grain-bowl.webp", time: "25 min" },
+          { t: "Charred broccoli", img: R + "charred-broccoli.webp", time: "35 min" },
+          { t: "Beans in olive oil", img: R + "white-beans.webp", time: "20 min" },
+          { t: "Lettuce cups", img: R + "lettuce-cups.webp", time: "15 min" },
+        ],
+        slots: [null, null, null, null, null],
+      },
+    },
+  ];
+  var EXTRA_KEY = "cloveGoals2Extra";
+  var extras = (function () {
+    try { return JSON.parse(localStorage.getItem(EXTRA_KEY) || "[]"); } catch (e) { return []; }
+  })();
+  var EXTRAS = {};
+  function registerExtra(a) {
+    EXTRAS[a.label] = a;
+    META[a.label] = a.meta;
+  }
+  ADDABLE.forEach(function (a) { if (extras.indexOf(a.label) > -1) registerExtra(a); });
 
   var T = window.Tracker = {
     TOTAL: TOTAL,
@@ -105,6 +155,7 @@
     doneCount: doneCount,
     pctFor: pctFor,
     slides: slides,
+    EXTRAS: EXTRAS,
     LIVE_PLAN: "https://reginaldoke.github.io/Reg-Clove-Design-Challenge/plan.html?ask=1",
     /* pages assign this: () => the goal the page is showing right now */
     cur: function () { return slides()[0]; },
@@ -290,10 +341,43 @@
     '<rect x="17.5" y="5" width="2.5" height="6" rx="1.25"/>' +
     "</g></svg></span></button>";
   document.querySelector(".phone").appendChild(ask);
-  ask.querySelector(".ask-bar__pill").addEventListener("click", function () {
-    var edit = document.getElementById("glEdit");
-    if (edit) edit.click();
-  });
+  /* tap: the ask types itself out, Clove listens, and the goal lands as
+     a brand-new plate (concept pages jump to it via T.onGoalAdded) */
+  T.askFlow = function () {
+    if (ask._busy) return;
+    var next = null;
+    for (var i = 0; i < ADDABLE.length; i++) if (extras.indexOf(ADDABLE[i].label) === -1) { next = ADDABLE[i]; break; }
+    var ph = ask.querySelector(".ask-bar__ph");
+    var mic = ask.querySelector(".ask-bar__mic");
+    if (!next) {
+      ph.textContent = "You're tracking everything for now";
+      setTimeout(function () { ph.textContent = "Describe a health goal"; }, 2200);
+      return;
+    }
+    ask._busy = true;
+    ph.classList.add("on");
+    ph.textContent = "";
+    var words = next.phrase.split(" ");
+    words.forEach(function (w, k) {
+      setTimeout(function () { ph.textContent += (k ? " " : "") + w; }, 240 + k * 170);
+    });
+    var typed = 240 + words.length * 170;
+    setTimeout(function () { mic.classList.add("listening"); }, typed);
+    setTimeout(function () {
+      mic.classList.remove("listening");
+      extras.push(next.label);
+      localStorage.setItem(EXTRA_KEY, JSON.stringify(extras));
+      registerExtra(next);
+      CloveMemory.toast(next.toast, "", { goal: true });
+      if (T.onGoalAdded) T.onGoalAdded(next.label);
+    }, typed + 1100);
+    setTimeout(function () {
+      ph.classList.remove("on");
+      ph.textContent = "Describe a health goal";
+      ask._busy = false;
+    }, typed + 2100);
+  };
+  ask.querySelector(".ask-bar__pill").addEventListener("click", function () { T.askFlow(); });
 
   /* ---- goal sheet ("What are you working on?") ---- */
   var sheet = document.getElementById("glSheet");
@@ -329,7 +413,8 @@
       setTimeout(function () { sheet.hidden = true; }, 480);
     }
     document.getElementById("glScrim").addEventListener("click", closeSheet);
-    document.getElementById("glEdit").addEventListener("click", openSheet);
+    var edit = document.getElementById("glEdit");
+    if (edit) edit.addEventListener("click", openSheet);
     T.sheetDrag(sheet.querySelector(".gl-sheet__card"), closeSheet, "translate(-50%, 0)");
   };
 
@@ -379,7 +464,7 @@
 
   /* ---- week chart (concepts 1 and 2), dinner-driven ---- */
   T.drawWeek = function (s) {
-    var r = s.ring;
+    var r = s.ring || {};
     var svg = document.getElementById("glChart");
     if (!svg) return;
     var goalN = s.goalN || r.goalN || parseFloat(String(r.goal).replace(/[^\d.]/g, "")) || 1;

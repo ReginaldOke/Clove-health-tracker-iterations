@@ -19,9 +19,6 @@
   <main class="gl-body" id="glBody">
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
-      <button class="gl-edit" id="glEdit" aria-label="Edit health goals">
-        <span class="ico ico-20"><img src="assets/icons/pencil.svg" alt="" style="width:16px;height:16px" /></span>
-      </button>
     </div>
 
     <!-- the plate IS the chart: a dressed plate per goal, swipe between them -->
@@ -223,6 +220,13 @@
       var idx = Array.prototype.indexOf.call(this.children, slide);
       if (idx > -1 && idx !== active) this.scrollTo({ left: idx * PITCH, behavior: "smooth" });
     });
+    T.onGoalAdded = function (label) {
+      render(true);
+      setTimeout(function () {
+        var idx = T.slides().map(function (x) { return x.label; }).indexOf(label);
+        document.getElementById("g2Car").scrollTo({ left: idx * PITCH, behavior: "smooth" });
+      }, 350);
+    };
     T.bindSheet(render);
     T.bindNudge();
     render(true);

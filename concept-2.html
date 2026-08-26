@@ -20,9 +20,6 @@
   <main class="gl-body" id="glBody">
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
-      <button class="gl-edit" id="glEdit" aria-label="Edit health goals">
-        <span class="ico ico-20"><img src="assets/icons/pencil.svg" alt="" style="width:16px;height:16px" /></span>
-      </button>
     </div>
 
     <!-- the empty plate wears the ring: swipe for the next goal -->
@@ -146,6 +143,7 @@
       if (i === active) return;
       active = i;
       setMeta(i);
+      cueCutlery();
       var below = document.getElementById("g2Below");
       below.classList.add("g2-below--fade");
       clearTimeout(below._t);
@@ -216,9 +214,19 @@
         planCard.classList.add("ai-card--reveal");
       }
     }
+    function cueCutlery() {
+      var s = T.cur();
+      document.querySelectorAll(".g3-cutlery").forEach(function (el) {
+        el.style.setProperty("--cue", s.color);
+        el.classList.remove("cue");
+        void el.offsetWidth;
+        el.classList.add("cue");
+      });
+    }
     function render(animate) {
       renderHero(animate);
       renderBelow(animate);
+      setTimeout(cueCutlery, animate ? 500 : 60);
     }
 
     T.onAdd = function (free) { renderMeals(free); };
@@ -229,6 +237,13 @@
     };
     T.bindLongPress(document.getElementById("g3Cards"), function (i) { T.openMealSheet(i); });
     T.makeSwipeable(document.getElementById("g2Car"), PITCH, function () { return T.slides().length; });
+    T.onGoalAdded = function (label) {
+      render(true);
+      setTimeout(function () {
+        var idx = T.slides().map(function (x) { return x.label; }).indexOf(label);
+        document.getElementById("g2Car").scrollTo({ left: idx * PITCH, behavior: "smooth" });
+      }, 350);
+    };
     T.bindSheet(render);
     T.bindNudge();
     render(true);
