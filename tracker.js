@@ -81,9 +81,15 @@
   function doneCount(label) { return slotsFor(label).filter(function (s) { return s && s.done; }).length; }
   /* dinners, not milligrams: each ticked dinner is worth ~19% of the ring */
   function pctFor(label) { return Math.min(0.96, 0.19 * doneCount(label)); }
+  /* ring colours follow the plate's food: egg = orange, salad = green */
+  var RING_COLOR = {
+    Protein: { color: "var(--paprika-300)", track: "var(--paprika-100)" },
+    Energy: { color: "var(--kale-300)", track: "var(--kale-100)" },
+  };
   function slides() {
     return G.rings().map(function (r) {
-      return { label: r.label, pct: pctFor(r.label), color: r.color, track: r.track, ring: r };
+      var o = RING_COLOR[r.label] || r;
+      return { label: r.label, pct: pctFor(r.label), color: o.color, track: o.track, ring: r };
     });
   }
 
@@ -375,7 +381,7 @@
       return "C" + cx.toFixed(1) + " " + q.y.toFixed(1) + " " + cx.toFixed(1) + " " + p.y.toFixed(1) + " " + p.x.toFixed(1) + " " + p.y.toFixed(1);
     }).join(" ");
     var last = pts[pts.length - 1];
-    var lg = (G.GRADS[r.color] || [r.color, r.color]);
+    var lg = (G.GRADS[s.color] || [s.color, s.color]);
     lg = [lg[0], lg[1]];
     svg.innerHTML =
       '<defs><linearGradient id="cum" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + lg[1] + '" stop-opacity="0.26"/><stop offset="100%" stop-color="' + lg[1] + '" stop-opacity="0"/></linearGradient>' +

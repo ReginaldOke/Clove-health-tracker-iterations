@@ -31,6 +31,17 @@
 }
 .plate-art .pp.off { opacity: 0; transform: scale(0.35) rotate(-16deg); }
 
+/* the pink plan nudge stays pinned to the bottom of the phone, the same
+   way the groceries CTA floats above the tab bar in the full app */
+.gl-plan {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: 370px;
+  z-index: 40;
+}
+
 /* a finished week: the plate takes a little bow */
 @keyframes c-pulse {
   0% { transform: scale(1) rotate(0deg); }
