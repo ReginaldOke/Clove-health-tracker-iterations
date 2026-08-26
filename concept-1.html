@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="goals2.css" />
 <link rel="stylesheet" href="concepts.css" />
 </head>
-<body class="goals goals2">
+<body class="goals goals2 c1">
 <div class="phone">
 
   <nav class="gl-nav"></nav>
@@ -47,8 +47,6 @@
         <svg viewBox="0 0 320 108" preserveAspectRatio="none" id="glChart"></svg>
         <div class="gl-week__days"><span>M</span><span>T</span><span>W</span><span class="today">T</span><span>F</span><span>S</span><span>S</span></div>
       </section>
-
-      <button class="btn-tonal gl-browse" id="glInsCta">Browse iron-rich dinners</button>
 
       <div class="gl-plan" id="glPlanWrap">
         <button class="ai-card" id="glPlan">
@@ -118,10 +116,10 @@
     function renderHero(animate) {
       var car = document.getElementById("g2Car");
       car.innerHTML = T.slides().map(function (s) {
-        return '<div class="g2-slide">' +
-          ClovePlates.svg(s.label, TOTAL) +
-          G.ringsSVG([{ pct: s.pct, color: s.color, track: s.track }], 152, 11, null, animate) +
-          "</div>";
+        return '<div class="g2-slide"><div class="plate-chart">' +
+          '<img src="' + (ClovePlates.IMG[s.label] || ClovePlates.IMG.Iron) + '" alt="" />' +
+          ClovePlates.lipRing(s.pct, s.color, s.track, animate) +
+          "</div></div>";
       }).join("");
       document.getElementById("g2Dots").innerHTML = T.slides().map(function () { return "<i></i>"; }).join("");
       active = Math.max(0, Math.min(T.slides().length - 1, Math.round(car.scrollLeft / PITCH)));
@@ -156,9 +154,12 @@
       document.getElementById("g2GoalLine").textContent = "Goal: Eat " + TOTAL + " " + T.metaFor(s.label).flavor + " dinners";
       document.getElementById("g2Meals").innerHTML = T.slotsFor(s.label).map(function (m, i) {
         if (!m) return '<button class="g2-meal g2-meal--empty" data-i="' + i + '" aria-label="Add a dinner"></button>';
-        return '<button class="g2-meal' + (m.done ? " done" : "") + (i === popIdx ? " g2-meal--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +
+        return '<button class="g2-meal' + (m.done ? " done" : " g2-meal--planned") + (i === popIdx ? " g2-meal--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +
           '<img src="' + m.img + '" alt="" />' +
-          '<span class="g2-meal__badge" style="background:' + s.color + '"><img src="assets/icons/check-sm.svg" alt="" /></span></button>';
+          (m.done
+            ? '<span class="g2-meal__badge" style="background:' + s.color + '"><img src="assets/icons/check-sm.svg" alt="" /></span>'
+            : '<span class="g2-meal__badge cal"><img src="assets/icons/cal-24-dark.svg" alt="" /></span>') +
+          "</button>";
       }).join("");
     }
     document.getElementById("g2Meals").addEventListener("click", function (e) {
@@ -169,23 +170,22 @@
       if (!slots[i]) { T.openModal(); return; }
       slots[i].done = !slots[i].done;
       T.saveState();
-      btn.classList.toggle("done", slots[i].done);
+      renderMeals(-1);
       easeActiveRing();
       setMeta(active, false);
       T.drawWeek(T.cur());
       if (slots[i].done && T.maybeCelebrate(T.cur().label)) {
-        var slide = document.querySelectorAll("#g2Car .g2-slide")[active];
-        slide.classList.remove("celebrate"); void slide.offsetWidth;
-        slide.classList.add("celebrate");
+        var chart = document.querySelectorAll("#g2Car .plate-chart")[active];
+        chart.classList.remove("celebrate"); void chart.offsetWidth;
+        chart.classList.add("celebrate");
       }
     });
 
     /* ---- everything under the carousel ---- */
     function renderBelow(animate) {
-      var s = T.cur(), m = T.metaFor(s.label);
+      var s = T.cur();
       renderMeals(-1);
       T.drawWeek(s);
-      document.getElementById("glInsCta").textContent = "Browse " + m.flavor + " dinners";
       document.getElementById("glPlanT").textContent = "Plan meals to hit your " + s.label.toLowerCase() + " goal";
       document.getElementById("glPlanS").textContent = "Health goal: " + s.label;
       var planCard = document.querySelector("#glPlanWrap .ai-card");
@@ -208,7 +208,7 @@
     }
 
     T.onAdd = function (free) { renderMeals(free); };
-    document.getElementById("glInsCta").addEventListener("click", T.openModal);
+    T.makeSwipeable(document.getElementById("g2Car"), PITCH, function () { return T.slides().length; });
     T.bindSheet(render);
     T.bindNudge();
     render(true);

@@ -97,7 +97,42 @@
     ],
   };
 
+  /* progress ring drawn ON the plate's lip, in the exported plates'
+     own coordinate frame (viewBox 190, plate centre 95/88.2, plate r 77,
+     well r 58.4) so the ring and plate can never drift apart */
+  var GRADS = {
+    "var(--eggplant-300)": ["#e1c3ff", "#bd53ea", "#8f3ecb"],
+    "var(--kale-300)": ["#d5ff73", "#1aab56", "#0f7a3c"],
+    "var(--paprika-300)": ["#ffd98a", "#f79310", "#d9730a"],
+  };
+  function lipRing(pct, color, track, animateIn) {
+    var CX = 95, CY = 88.2, R = 67.7, STROKE = 14.5;
+    var C = 2 * Math.PI * R;
+    var dash = (animateIn ? 0 : pct * C).toFixed(1) + " " + C.toFixed(1);
+    var g = GRADS[color];
+    var id = "lr" + (++uid);
+    var stroke = color;
+    var defs = "";
+    if (g) {
+      defs = '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="' + g[0] + '"/><stop offset="55%" stop-color="' + g[1] + '"/><stop offset="100%" stop-color="' + g[2] + '"/></linearGradient></defs>';
+      stroke = "url(#" + id + ")";
+    }
+    return '<svg class="lip-ring" viewBox="0 0 190 190" fill="none" xmlns="http://www.w3.org/2000/svg">' + defs +
+      '<circle cx="' + CX + '" cy="' + CY + '" r="' + R + '" stroke="' + track + '" stroke-width="' + STROKE + '"/>' +
+      '<circle class="gl-ring__arc" data-dash="' + (pct * C).toFixed(1) + " " + C.toFixed(1) + '" cx="' + CX + '" cy="' + CY + '" r="' + R +
+      '" stroke="' + stroke + '" stroke-width="' + STROKE + '" stroke-linecap="round" stroke-dasharray="' + dash +
+      '" transform="rotate(-90 ' + CX + " " + CY + ')" style="transition:stroke-dasharray 1.1s cubic-bezier(.25,1,.35,1) .1s"/>' +
+      "</svg>";
+  }
+
   window.ClovePlates = {
+    lipRing: lipRing,
+    /* the plate illustration each goal wears (from the Figma set) */
+    IMG: {
+      Iron: "assets/img/goals/plate-steak.svg",
+      Protein: "assets/img/goals/plate-salad2.svg",
+      Energy: "assets/img/goals/plate-egg.svg",
+    },
     /* markup for one plate. label: Iron/Protein/Energy (unknown labels get
        the Iron salad). n: portions shown at rest (the rest render with
        class "off" so concept 3 can reveal them later with a transition). */

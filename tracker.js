@@ -148,9 +148,6 @@
     saveState();
     T.closeModal();
     if (T.onAdd) T.onAdd(free);
-    setTimeout(function () {
-      CloveMemory.toast("Added to your week: " + r.t, "Tick it off once you cook it", { goal: true });
-    }, 420);
   });
 
   /* ---- goal sheet ("What are you working on?") ---- */
@@ -190,11 +187,48 @@
     document.getElementById("glEdit").addEventListener("click", openSheet);
   };
 
-  /* ---- pink nudge → the meal-planning flow in the full prototype ---- */
-  T.bindNudge = function () {
-    document.getElementById("glPlan").addEventListener("click", function () {
-      window.open(T.LIVE_PLAN, "_blank");
+  /* ---- pink nudge: press feedback only in this standalone deck ---- */
+  T.bindNudge = function () {};
+
+  /* ---- swipe/drag for the plate carousel ----
+     Native scroll-snap gives touch swiping, but a mouse cannot drag a
+     scroll container, and panning scrollLeft mid-drag fights the snap.
+     So: snap off while the pointer is down, pan by hand, then spring to
+     the nearest plate on release (with a little flick momentum). */
+  T.makeSwipeable = function (car, pitch, count) {
+    var down = null, moved = false;
+    car.addEventListener("pointerdown", function (e) {
+      if (e.button) return;
+      down = { x: e.clientX, sl: car.scrollLeft, lastX: e.clientX, lastT: e.timeStamp, vx: 0 };
+      moved = false;
+      car.classList.add("dragging");
+      car.scrollTo({ left: car.scrollLeft }); /* halt any smooth glide */
     });
+    window.addEventListener("pointermove", function (e) {
+      if (!down) return;
+      var dx = e.clientX - down.lastX, dt = Math.max(1, e.timeStamp - down.lastT);
+      down.vx = 0.8 * down.vx + 0.2 * (dx / dt);
+      down.lastX = e.clientX; down.lastT = e.timeStamp;
+      if (Math.abs(e.clientX - down.x) > 6) moved = true;
+      if (moved) car.scrollLeft = down.sl - (e.clientX - down.x);
+    });
+    function release(e) {
+      if (!down) return;
+      var v = down.vx, was = moved;
+      down = null; moved = false;
+      if (!was) { car.classList.remove("dragging"); return; }
+      var i = Math.max(0, Math.min(count() - 1, Math.round((car.scrollLeft - v * 180) / pitch)));
+      car.scrollTo({ left: i * pitch, behavior: "smooth" });
+      setTimeout(function () { car.classList.remove("dragging"); }, 480);
+      car._swiped = true;
+      setTimeout(function () { car._swiped = false; }, 0);
+    }
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
+    /* a drag must not count as a tap on whatever it started over */
+    car.addEventListener("click", function (e) {
+      if (car._swiped) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
   };
 
   /* ---- week chart (concepts 1 and 2), dinner-driven ---- */

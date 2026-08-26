@@ -1,26 +1,29 @@
 /* ============================================================
-   Shared styling for the standalone health-tracker concepts:
-   plate illustration sizing, portion reveals, celebrations.
+   Shared styling for the standalone health-tracker concepts.
    Loads after goals.css / goals2.css / goals3.css.
    ============================================================ */
 
 /* no back chevron in the standalone concepts, keep the breathing room */
 .gl-nav { min-height: 44px; }
 
-/* concept 1: the illustrated plate inside each carousel slide */
-.g2-slide .plate-art {
+/* the plate + its lip ring share one coordinate frame, so they are
+   always exactly concentric */
+.plate-chart {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 158px;
-  height: 158px;
-  transform: translate(-50%, calc(-50% + 3px));
-  pointer-events: none;
+  width: 164px;
+  height: 164px;
+  transform: translate(-50%, -50%);
 }
+.plate-chart > img, .plate-chart .lip-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* concept 2: the empty plate keeps using the exported asset */
+/* draggable carousel: snap pauses while the pointer holds the plates */
+.g2-carousel { cursor: grab; }
+.g2-carousel.dragging { scroll-snap-type: none; cursor: grabbing; }
+.g2-carousel.dragging .g2-slide { pointer-events: none; }
 
-/* portions pop in one by one (concept 3), spring + settle */
+/* portions pop in one by one, spring + settle */
 .plate-art .pp {
   transform-box: fill-box;
   transform-origin: center;
@@ -31,14 +34,63 @@
 /* a finished week: the plate takes a little bow */
 @keyframes c-pulse {
   0% { transform: scale(1) rotate(0deg); }
-  30% { transform: scale(1.06) rotate(-2deg); }
-  60% { transform: scale(1.03) rotate(2deg); }
+  30% { transform: scale(1.05) rotate(-2deg); }
+  60% { transform: scale(1.02) rotate(2deg); }
   100% { transform: scale(1) rotate(0deg); }
 }
 .celebrate { animation: c-pulse 760ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
 
 /* ============================================================
-   Concept 3 — "Fill your plate"
+   Concept 1 (body.c1) — dressed plates
+   ============================================================ */
+body.c1 .gl-body { gap: 18px; }
+body.c1 .gl-week { margin: 14px 0; }
+/* a planned dinner wears a little calendar until it is cooked */
+.g2-meal__badge.cal { background: var(--white) !important; box-shadow: 0 2px 8px rgba(15, 18, 21, 0.2); }
+.g2-meal__badge.cal img { width: 12px; height: 12px; }
+.g2-meal--planned .g2-meal__badge { opacity: 1; transform: scale(1); }
+
+/* ============================================================
+   Concept 2 (body.g3) — the clean plate
+   ============================================================ */
+/* type hierarchy: quiet caps for the hero label, a proper section title
+   for the week, both styles already used across the app */
+.g3 .g2-hero__lbl {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--kale-500);
+}
+.g3-week-lbl { font-size: 20px; font-weight: 600; letter-spacing: -0.2px; color: var(--black-500); }
+.g3-week-tot { font-size: 14px; font-weight: 300; letter-spacing: -0.14px; color: var(--black-300); }
+.g3-week-tot b { font-weight: 300; color: var(--black-500); }
+
+/* the % sits in the plate's well */
+.g3 .g3-pct {
+  position: absolute;
+  left: 50%;
+  top: 46.4%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.55px;
+  line-height: 1;
+  color: var(--black-500);
+}
+
+/* content breathes to fill the phone */
+.g3 .gl-body { gap: 24px; }
+.g3 .gl-week svg { height: 118px; }
+.g3 .g2-hero { height: 214px; }
+
+.g3 .g3-cutlery { top: 65px; }
+
+/* meal cards wrap onto the next row instead of scrolling away */
+.g3-cards { flex-wrap: wrap; overflow: visible; }
+
+/* ============================================================
+   Concept 3 (body.c3) — the set table
    ============================================================ */
 .c3-hero { padding: 18px 18px 20px; }
 .c3-head { display: flex; align-items: flex-start; gap: 14px; }
@@ -69,42 +121,65 @@
 .c3-prov { margin-top: 4px; font-size: 12.5px; line-height: 1.4; color: var(--black-400); }
 .c3-prov .spark { color: var(--eggplant-300); margin-right: 2px; }
 
-.c3-plate { display: flex; justify-content: center; margin-top: 4px; }
-.c3-plate .plate-art { width: 210px; height: 210px; }
-/* the swap between goals: the outgoing plate dips, the incoming one lands */
-.c3-plate.swap .plate-art { animation: c3-land 520ms cubic-bezier(0.22, 1.2, 0.36, 1) 1; }
-@keyframes c3-land { from { opacity: 0; transform: scale(0.86); } }
+/* the table, seen from above: five places, one per dinner */
+.c3-table { position: relative; height: 296px; margin-top: 14px; }
+.c3-table.swap { animation: c3-land 520ms cubic-bezier(0.22, 1.2, 0.36, 1) 1; }
+@keyframes c3-land { from { opacity: 0; transform: scale(0.9); } }
+.c3-cloth {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 324px;
+  height: 214px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fcfaf4 0%, #f3eee1 100%);
+  border: 1.5px solid #ede7d7;
+  box-shadow: inset 0 -10px 22px rgba(15, 18, 21, 0.035), 0 10px 22px rgba(15, 18, 21, 0.06);
+}
+.c3-centerpiece {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+  text-align: center;
+}
+.c3-centerpiece img { width: 13px; height: 14px; opacity: 0.9; }
+.c3-centerpiece span { font-size: 11.5px; line-height: 1.35; color: var(--black-400); }
+.c3-centerpiece b { font-weight: 600; color: var(--kale-500); }
 
-.c3-story { margin-top: 2px; text-align: center; font-size: 15px; line-height: 1.4; color: var(--black-400); }
-.c3-story b { font-weight: 600; color: var(--black-500); }
-
-/* the week's dinners as small stamps under the plate */
-.c3-stamps { display: flex; justify-content: center; gap: 12px; margin-top: 14px; }
-.c3-stamp {
-  position: relative;
-  flex: none;
-  width: 44px;
-  height: 44px;
+/* a place at the table */
+.c3-seat {
+  position: absolute;
+  width: 58px;
+  height: 58px;
   padding: 0;
   border: none;
   border-radius: 999px;
   background: none;
   cursor: pointer;
   font-family: inherit;
-  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(-50%, -50%);
+  transition: transform 200ms cubic-bezier(0.22, 1.4, 0.36, 1);
 }
-.c3-stamp:active { transform: scale(0.9); }
-.c3-stamp > img { width: 100%; height: 100%; border-radius: 999px; object-fit: cover; display: block; }
-.c3-stamp--in > img { animation: g2-meal-pop 420ms cubic-bezier(0.22, 1.4, 0.36, 1) both; }
-.c3-stamp__badge {
+.c3-seat:active { transform: translate(-50%, -50%) scale(0.9); }
+.c3-seat .plate-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.c3-seat--in { animation: seat-pop 460ms cubic-bezier(0.22, 1.4, 0.36, 1) both; }
+@keyframes seat-pop { from { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.c3-seat__badge {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 18px;
-  height: 18px;
+  right: 1px;
+  bottom: 1px;
+  width: 17px;
+  height: 17px;
   border-radius: 999px;
-  background: var(--eggplant-300);
   border: 2px solid var(--white);
+  background: var(--kale-300);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,10 +187,11 @@
   transform: scale(0.4);
   transition: opacity 160ms ease, transform 280ms cubic-bezier(0.22, 1.5, 0.36, 1);
 }
-.c3-stamp__badge img { width: 9px; height: 7px; }
-.c3-stamp.done .c3-stamp__badge { opacity: 1; transform: scale(1); }
-.c3-stamp--add { background: #fcfbfb; border: 2px dashed var(--black-200); }
-.c3-stamp--add::before, .c3-stamp--add::after {
+.c3-seat__badge img { width: 8px; height: 6px; }
+.c3-seat.done .c3-seat__badge { opacity: 1; transform: scale(1); }
+/* an empty place waiting for a dinner */
+.c3-seat--add { background: rgba(255, 255, 255, 0.55); border: 2px dashed var(--black-200); }
+.c3-seat--add::before, .c3-seat--add::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -123,8 +199,23 @@
   background: var(--black-300);
   border-radius: 2px;
 }
-.c3-stamp--add::before { width: 13px; height: 2px; transform: translate(-50%, -50%); }
-.c3-stamp--add::after { width: 2px; height: 13px; transform: translate(-50%, -50%); }
+.c3-seat--add::before { width: 14px; height: 2px; transform: translate(-50%, -50%); }
+.c3-seat--add::after { width: 2px; height: 14px; transform: translate(-50%, -50%); }
+/* the dinner's name, whispered under each set place */
+.c3-seat__day {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 3px);
+  transform: translateX(-50%);
+  font-size: 10px;
+  line-height: 1;
+  color: var(--black-300);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.c3-story { margin-top: 6px; text-align: center; font-size: 15px; line-height: 1.4; color: var(--black-400); }
+.c3-story b { font-weight: 600; color: var(--black-500); }
 
 /* the other goals, deliberately quiet: label + chips, no numbers */
 .c3-switch { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0 4px; }
@@ -144,3 +235,4 @@
   transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), background 160ms ease;
 }
 .c3-chip:active { transform: scale(0.94); }
+body.c3 .gl-body { gap: 20px; }

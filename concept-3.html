@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="goals2.css" />
 <link rel="stylesheet" href="concepts.css" />
 </head>
-<body class="goals goals2">
+<body class="goals goals2 c3">
 <div class="phone">
 
   <nav class="gl-nav"></nav>
@@ -24,7 +24,7 @@
       </button>
     </div>
 
-    <!-- one clear focus; the plate fills as the week gets cooked -->
+    <!-- one clear focus; five places at the table, one per dinner -->
     <section class="pcard c3-hero" id="c3Hero">
       <div class="c3-head">
         <span class="c3-heart"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></span>
@@ -34,9 +34,12 @@
           <p class="c3-prov" id="c3Prov"><span class="spark">✦</span> Added from your voice note</p>
         </div>
       </div>
-      <div class="c3-plate" id="c3Plate"></div>
+      <div class="c3-table" id="c3Table">
+        <div class="c3-cloth"></div>
+        <div class="c3-centerpiece" id="c3Center"></div>
+        <div id="c3Seats"></div>
+      </div>
       <p class="c3-story" id="c3Story"></p>
-      <div class="c3-stamps" id="c3Stamps"></div>
     </section>
 
     <!-- the other goals stay quiet: no rings, no numbers -->
@@ -96,57 +99,66 @@
     }
     T.cur = function () { return slideFor(focus); };
 
-    /* ---- the plate fills, one portion per cooked dinner ---- */
-    function renderPlate(fresh) {
-      var wrap = document.getElementById("c3Plate");
-      wrap.innerHTML = ClovePlates.svg(focus, 0);
-      if (fresh) { wrap.classList.remove("swap"); void wrap.offsetWidth; wrap.classList.add("swap"); }
-      /* portions land after paint so the transition runs */
-      setTimeout(function () { syncPortions(); }, fresh ? 260 : 60);
+    /* five places around the table (relative to its centre) */
+    var SEATS = [
+      { x: 0, y: -78 },
+      { x: 112, y: -27 },
+      { x: 74, y: 62 },
+      { x: -74, y: 62 },
+      { x: -112, y: -27 },
+    ];
+
+    function shortName(t) { return t.length > 13 ? t.slice(0, 12).replace(/ $/, "") + "…" : t; }
+
+    /* ---- the table: cooked places hold a full plate of the goal's food ---- */
+    function renderSeats(popIdx) {
+      document.getElementById("c3Seats").innerHTML = T.slotsFor(focus).map(function (m, i) {
+        var pos = 'style="left:calc(50% + ' + SEATS[i].x + 'px);top:calc(50% + ' + SEATS[i].y + 'px)"';
+        if (!m) return '<button class="c3-seat c3-seat--add" data-i="' + i + '" ' + pos + ' aria-label="Add a dinner"></button>';
+        return '<button class="c3-seat' + (m.done ? " done" : "") + (i === popIdx ? " c3-seat--in" : "") + '" data-i="' + i + '" ' + pos + ' aria-label="' + m.t + '">' +
+          ClovePlates.svg(focus, m.done ? TOTAL : 0) +
+          '<span class="c3-seat__badge"><img src="assets/icons/check-sm.svg" alt="" /></span>' +
+          '<span class="c3-seat__day">' + shortName(m.t) + "</span></button>";
+      }).join("");
     }
-    function syncPortions() {
-      var n = T.doneCount(focus);
-      document.querySelectorAll("#c3Plate .pp").forEach(function (g, i) {
-        g.classList.toggle("off", i >= n);
-        /* stagger the initial fill */
-        g.style.transitionDelay = g.classList.contains("off") ? "0ms" : (i * 90) + "ms";
+    /* animate one seat's plate filling (or clearing) after a tick */
+    function syncSeat(btn, done) {
+      btn.classList.toggle("done", done);
+      var pps = btn.querySelectorAll(".pp");
+      pps.forEach(function (g, i) {
+        g.style.transitionDelay = done ? (i * 70) + "ms" : "0ms";
+        g.classList.toggle("off", !done);
       });
     }
-
+    function renderCenter() {
+      var n = T.doneCount(focus);
+      document.getElementById("c3Center").innerHTML =
+        '<img src="assets/icons/clove-kale.svg" alt="" />' +
+        (n >= TOTAL ? "<span><b>Table set</b></span>" : "<span><b>" + (TOTAL - n) + "</b> to go</span>");
+    }
     function renderStory() {
       var n = T.doneCount(focus), flavor = T.metaFor(focus).flavor;
       var el = document.getElementById("c3Story");
       el.innerHTML = n >= TOTAL
-        ? "<b>All " + TOTAL + "</b> " + flavor + " dinners cooked · week complete"
-        : "<b>" + n + " of " + TOTAL + "</b> " + flavor + " dinners cooked · " + (TOTAL - n) + " to go";
+        ? "<b>All " + TOTAL + "</b> " + flavor + " dinners cooked · your table is set"
+        : "<b>" + n + " of " + TOTAL + "</b> " + flavor + " dinners cooked this week";
     }
-
-    /* ---- the week's dinners as small stamps ---- */
-    function renderStamps(popIdx) {
-      var s = T.cur();
-      document.getElementById("c3Stamps").innerHTML = T.slotsFor(focus).map(function (m, i) {
-        if (!m) return '<button class="c3-stamp c3-stamp--add" data-i="' + i + '" aria-label="Add a dinner"></button>';
-        return '<button class="c3-stamp' + (m.done ? " done" : "") + (i === popIdx ? " c3-stamp--in" : "") + '" data-i="' + i + '" aria-label="' + m.t + '">' +
-          '<img src="' + m.img + '" alt="" />' +
-          '<span class="c3-stamp__badge" style="background:' + s.color + '"><img src="assets/icons/check-sm.svg" alt="" /></span></button>';
-      }).join("");
-    }
-    document.getElementById("c3Stamps").addEventListener("click", function (e) {
-      var btn = e.target.closest(".c3-stamp");
+    document.getElementById("c3Seats").addEventListener("click", function (e) {
+      var btn = e.target.closest(".c3-seat");
       if (!btn) return;
       var i = Number(btn.dataset.i);
       var slots = T.slotsFor(focus);
       if (!slots[i]) { T.openModal(); return; }
-      /* tick a dinner: its badge pops and a fresh portion lands on the plate */
+      /* tick a dinner: that place setting fills with food */
       slots[i].done = !slots[i].done;
       T.saveState();
-      btn.classList.toggle("done", slots[i].done);
-      syncPortions();
+      syncSeat(btn, slots[i].done);
+      renderCenter();
       renderStory();
       if (slots[i].done && T.maybeCelebrate(focus)) {
-        var plate = document.querySelector("#c3Plate .plate-art");
-        plate.classList.remove("celebrate"); void plate.offsetWidth;
-        plate.classList.add("celebrate");
+        var table = document.getElementById("c3Table");
+        table.classList.remove("celebrate"); void table.offsetWidth;
+        table.classList.add("celebrate");
       }
     });
 
@@ -188,14 +200,19 @@
 
     function render(animate, swapping) {
       renderHead();
-      renderPlate(animate || swapping);
+      renderSeats(-1);
+      renderCenter();
       renderStory();
-      renderStamps(-1);
       renderChips();
       renderNudge(animate);
+      var table = document.getElementById("c3Table");
+      if (animate || swapping) {
+        table.classList.remove("swap"); void table.offsetWidth;
+        table.classList.add("swap");
+      }
     }
 
-    T.onAdd = function (free) { renderStamps(free); };
+    T.onAdd = function (free) { renderSeats(free); };
     T.bindSheet(function () { render(false, true); });
     T.bindNudge();
     render(true, false);

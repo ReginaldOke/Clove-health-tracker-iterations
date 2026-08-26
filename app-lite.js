@@ -7,7 +7,7 @@
   var travel = 0; // total movement, a tap with a little jitter is NOT a drag
   var DRAG_THRESHOLD = 7;
   var rail = null, flick = null;
-  var RAILS = ".rail, .g2-carousel, .g3-cards, .c3-stamps";
+  var RAILS = ".rail, .g3-cards";
 
   document.addEventListener("dragstart", function (e) { e.preventDefault(); });
 
