@@ -157,6 +157,10 @@
     pctFor: pctFor,
     slides: slides,
     EXTRAS: EXTRAS,
+    /* concepts A and B add meals straight into the data as cooked */
+    addAsDone: false,
+    EMOJI: { Iron: "\ud83e\udd69", Protein: "\ud83c\udf73", Fibre: "\ud83e\udd57", B12: "\ud83e\udd5a", Cholesterol: "\ud83c\udf3e" },
+    emojiFor: function (label) { return T.EMOJI[label] || "\ud83c\udf7d\ufe0f"; },
     LIVE_PLAN: "https://reginaldoke.github.io/Reg-Clove-Design-Challenge/plan.html?ask=1",
     /* pages assign this: () => the goal the page is showing right now */
     cur: function () { return slides()[0]; },
@@ -209,11 +213,14 @@
     var r = metaFor(s.label).recipes[Number(btn.dataset.i)];
     var target = T._replace !== null ? T._replace : slots.indexOf(null);
     if (target === -1) return;
-    slots[target] = { img: r.img, t: r.t, done: false };
+    slots[target] = { img: r.img, t: r.t, done: !!T.addAsDone };
     T._replace = null;
     saveState();
     T.closeModal();
     if (T.onAdd) T.onAdd(target);
+    setTimeout(function () {
+      CloveMemory.toast("Added to meal plan: " + r.t, "", { goal: true });
+    }, 380);
   });
 
   /* ---- meal actions sheet (same bones as plan.html's meal sheet):
@@ -379,6 +386,8 @@
     }, typed + 2100);
   };
   ask.querySelector(".ask-bar__pill").addEventListener("click", function () { T.askFlow(); });
+  var heart = document.getElementById("glHeart");
+  if (heart) heart.addEventListener("click", function () { T.askFlow(); });
 
   /* ---- goal sheet ("What are you working on?") ---- */
   var sheet = document.getElementById("glSheet");

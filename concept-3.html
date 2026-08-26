@@ -20,13 +20,16 @@
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
       <span class="gl-count"><b id="glCount">3</b><img src="assets/icons/chevron-rt.svg" alt="" /></span>
+      <button class="gl-heart" id="glHeart" aria-label="Describe a health goal"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></button>
     </div>
 
     <!-- < Iron goal > : the chevrons walk through the tracked goals -->
     <div class="b3-switch">
-      <button class="b3-chev" id="b3Prev" aria-label="Previous goal"><img src="assets/icons/chevron-rt.svg" alt="" style="transform:rotate(90deg)" /></button>
-      <h2 id="b3Title">Iron goal</h2>
-      <button class="b3-chev" id="b3Next" aria-label="Next goal"><img src="assets/icons/chevron-rt.svg" alt="" style="transform:rotate(-90deg)" /></button>
+      <h2 id="b3Title"><span class="e">🥩</span>Iron goal</h2>
+      <div class="b3-steps">
+        <button class="b3-chev" id="b3Prev" aria-label="Previous goal"><img src="assets/icons/chevron-rt.svg" alt="" style="transform:rotate(90deg)" /></button>
+        <button class="b3-chev" id="b3Next" aria-label="Next goal"><img src="assets/icons/chevron-rt.svg" alt="" style="transform:rotate(-90deg)" /></button>
+      </div>
     </div>
 
     <div class="b3-body" id="b3Body">
@@ -178,7 +181,7 @@
       var s = T.cur(), c = chartFor(s);
       var days = daysFor(s, c);
       var tone = TONE[s.color] || TONE["var(--eggplant-300)"];
-      document.getElementById("b3Title").textContent = s.label + " goal";
+      document.getElementById("b3Title").innerHTML = '<span class="e">' + T.emojiFor(s.label) + "</span>" + s.label + " goal";
       /* stat: the average over the days you cooked */
       var cooked = days.filter(Boolean);
       var avg = cooked.length ? cooked.reduce(function (a, d) { return a + d.v; }, 0) / cooked.length : 0;

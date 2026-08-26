@@ -20,6 +20,7 @@
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
       <span class="gl-count"><b id="glCount">3</b><img src="assets/icons/chevron-rt.svg" alt="" /></span>
+      <button class="gl-heart" id="glHeart" aria-label="Describe a health goal"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></button>
     </div>
 
     <!-- the plate IS the chart: a dressed plate per goal, swipe between them -->
@@ -97,7 +98,7 @@
     /* ---- hero carousel: an illustrated plate per goal ---- */
     function setMeta(i, animatePct) {
       var s = T.slides()[i];
-      document.getElementById("g2Lbl").textContent = s.label + " goal";
+      document.getElementById("g2Lbl").textContent = T.emojiFor(s.label) + " " + s.label + " goal";
       var pctEl = document.getElementById("g2Pct");
       var target = Math.round(s.pct * 100);
       clearInterval(pctEl._iv);
@@ -224,7 +225,14 @@
       document.getElementById("glCount").textContent = T.slides().length;
     }
 
-    T.onAdd = function (free) { renderMeals(free); };
+    T.addAsDone = true;
+    T.onAdd = function (free) {
+      renderMeals(free);
+      easeActiveRing();
+      setMeta(active, false);
+      T.drawWeek(T.cur());
+      pulsePlate();
+    };
     T.onMealChange = function () {
       renderMeals(-1);
       easeActiveRing();

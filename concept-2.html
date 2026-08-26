@@ -21,6 +21,7 @@
     <div class="gl-title-row">
       <h1 class="gl-title">Health goals</h1>
       <span class="gl-count"><b id="glCount">3</b><img src="assets/icons/chevron-rt.svg" alt="" /></span>
+      <button class="gl-heart" id="glHeart" aria-label="Describe a health goal"><img src="assets/icons/heart-sparkle-white.svg" alt="" /></button>
     </div>
 
     <!-- the empty plate wears the ring: swipe for the next goal -->
@@ -98,7 +99,7 @@
 
     /* ---- hero: full-width plate slides, % lives ON the plate ---- */
     function setMeta(i) {
-      document.getElementById("g2Lbl").textContent = T.slides()[i].label + " goal";
+      document.getElementById("g2Lbl").textContent = T.emojiFor(T.slides()[i].label) + " " + T.slides()[i].label + " goal";
       document.querySelectorAll("#g2Dots i").forEach(function (d, j) { d.classList.toggle("on", j === i); });
     }
     function setPlatePct(i, animatePct) {
@@ -242,7 +243,14 @@
       setTimeout(cueCutlery, animate ? 500 : 60);
     }
 
-    T.onAdd = function (free) { renderMeals(free); };
+    T.addAsDone = true;
+    T.onAdd = function (free) {
+      renderMeals(free);
+      easeActiveRing();
+      setGoalLine();
+      T.drawWeek(T.cur());
+      pulsePlate();
+    };
     T.onMealChange = function () {
       renderMeals(-1);
       easeActiveRing();
