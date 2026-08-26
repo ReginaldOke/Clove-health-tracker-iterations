@@ -186,6 +186,7 @@
       easeActiveRing();
       setGoalLine();
       T.drawWeek(T.cur());
+      if (slots[i].done) pulsePlate();
       if (slots[i].done && T.maybeCelebrate(T.cur().label)) {
         var chart = document.querySelectorAll("#g2Car .plate-chart")[active];
         chart.classList.remove("celebrate"); void chart.offsetWidth;
@@ -213,6 +214,15 @@
         planCard.classList.remove("ai-card--wait");
         planCard.classList.add("ai-card--reveal");
       }
+    }
+    /* the plate grows and glows when a meal is ticked off */
+    function pulsePlate() {
+      var slide = document.querySelectorAll("#g2Car .g2-slide")[active];
+      if (!slide) return;
+      slide.style.setProperty("--glow", T.cur().color);
+      slide.classList.remove("tick-pulse");
+      void slide.offsetWidth;
+      slide.classList.add("tick-pulse");
     }
     function cueCutlery() {
       var s = T.cur();

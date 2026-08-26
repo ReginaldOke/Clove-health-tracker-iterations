@@ -132,6 +132,15 @@
       arc.style.transition = "stroke-dasharray 900ms cubic-bezier(.25,1,.35,1)";
       arc.setAttribute("stroke-dasharray", (T.cur().pct * C).toFixed(1) + " " + C.toFixed(1));
     }
+    /* the plate grows and glows when a meal is ticked off */
+    function pulsePlate() {
+      var slide = document.querySelectorAll("#g2Car .g2-slide")[active];
+      if (!slide) return;
+      slide.style.setProperty("--glow", T.cur().color);
+      slide.classList.remove("tick-pulse");
+      void slide.offsetWidth;
+      slide.classList.add("tick-pulse");
+    }
     function markActive() {
       document.querySelectorAll("#g2Car .g2-slide").forEach(function (sl, k) {
         sl.classList.toggle("on", k === active);
@@ -178,6 +187,7 @@
       easeActiveRing();
       setMeta(active, false);
       T.drawWeek(T.cur());
+      if (slots[i].done) pulsePlate();
       if (slots[i].done && T.maybeCelebrate(T.cur().label)) {
         var chart = document.querySelectorAll("#g2Car .plate-chart")[active];
         chart.classList.remove("celebrate"); void chart.offsetWidth;

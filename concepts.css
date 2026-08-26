@@ -126,6 +126,15 @@ body.c1 .g2-dots, .g3 .g2-dots { position: static; margin-top: 2px; }
   background: var(--kale-500);
 }
 
+/* ticking a meal off: the active plate grows and glows the goal colour */
+.g2-slide.tick-pulse { animation: tick-pulse 850ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
+@keyframes tick-pulse {
+  0% { transform: scale(1); filter: none; }
+  35% { transform: scale(1.07); filter: drop-shadow(0 0 16px var(--glow, #bd53ea)); }
+  70% { transform: scale(1.02); filter: drop-shadow(0 0 7px var(--glow, #bd53ea)); }
+  100% { transform: scale(1); filter: none; }
+}
+
 /* a finished week: the plate takes a little bow */
 @keyframes c-pulse {
   0% { transform: scale(1) rotate(0deg); }
