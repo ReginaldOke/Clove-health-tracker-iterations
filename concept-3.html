@@ -63,7 +63,7 @@
     <div class="gl-sheet__card">
       <div class="gl-sheet__grab"></div>
       <h2 class="gl-sheet__h" id="g2ModalH">Iron-rich dinners</h2>
-      <p class="gl-sheet__s">Tap a dinner to add it to your week.</p>
+      <p class="gl-sheet__s" id="g2ModalS">Tap a dinner to add it to your week.</p>
       <div class="g2-rgrid" id="g2Rgrid"></div>
     </div>
   </div>
@@ -213,6 +213,12 @@
     }
 
     T.onAdd = function (free) { renderSeats(free); };
+    T.onMealChange = function () {
+      renderSeats(-1);
+      renderCenter();
+      renderStory();
+    };
+    T.bindLongPress(document.getElementById("c3Seats"), function (i) { T.openMealSheet(i); });
     T.bindSheet(function () { render(false, true); });
     T.bindNudge();
     render(true, false);

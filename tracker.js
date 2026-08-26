@@ -116,12 +116,16 @@
 
   /* ---- recipe picker modal (CardRecipe, Figma 28275:52775) ---- */
   var modal = document.getElementById("g2Modal");
-  T.openModal = function () {
+  T._replace = null;
+  T.openModal = function (replaceIdx) {
+    T._replace = typeof replaceIdx === "number" ? replaceIdx : null;
     var s = T.cur(), m = metaFor(s.label), slots = slotsFor(s.label);
     var f = m.flavor;
     document.getElementById("g2ModalH").textContent = f.charAt(0).toUpperCase() + f.slice(1) + " dinners";
+    var sub = document.getElementById("g2ModalS");
+    if (sub) sub.textContent = T._replace === null ? "Tap a dinner to add it to your week." : "Tap a dinner to swap it in.";
     document.getElementById("g2Rgrid").innerHTML = m.recipes.map(function (r, i) {
-      var added = slots.some(function (x) { return x && x.t === r.t; });
+      var added = slots.some(function (x, k) { return k !== T._replace && x && x.t === r.t; });
       return '<button class="g2-rcard' + (added ? " added" : "") + '" data-i="' + i + '" style="--d:' + (i * 60) + 'ms">' +
         '<span class="g2-rcard__img"><img src="' + r.img + '" alt="" />' +
         '<span class="g2-rcard__time' + (added ? " in" : "") + '">' + (added ? "In your week ✓" : r.time) + "</span></span>" +
@@ -142,13 +146,124 @@
     if (!btn || btn.classList.contains("added")) return;
     var s = T.cur(), slots = slotsFor(s.label);
     var r = metaFor(s.label).recipes[Number(btn.dataset.i)];
-    var free = slots.indexOf(null);
-    if (free === -1) return;
-    slots[free] = { img: r.img, t: r.t, done: false };
+    var target = T._replace !== null ? T._replace : slots.indexOf(null);
+    if (target === -1) return;
+    slots[target] = { img: r.img, t: r.t, done: false };
+    T._replace = null;
     saveState();
     T.closeModal();
-    if (T.onAdd) T.onAdd(free);
+    if (T.onAdd) T.onAdd(target);
   });
+
+  /* ---- meal actions sheet (same bones as plan.html's meal sheet):
+          long-press any dinner for cooked-toggle / swap / remove ---- */
+  var msheet = document.createElement("div");
+  msheet.className = "meal-sheet";
+  msheet.innerHTML =
+    '<div class="meal-sheet__scrim"></div>' +
+    '<div class="meal-sheet__card"><span class="meal-sheet__grab"></span>' +
+    '<div class="meal-sheet__head"><span class="meal-sheet__img"><img alt="" /></span>' +
+    '<div><p class="meal-sheet__name"></p><p class="ms-sub"></p></div></div>' +
+    '<div class="meal-sheet__list"></div></div>';
+  document.querySelector(".phone").appendChild(msheet);
+  T.openMealSheet = function (i) {
+    var s = T.cur(), m = slotsFor(s.label)[i];
+    if (!m) return;
+    msheet._i = i;
+    msheet.querySelector(".meal-sheet__img img").src = m.img;
+    msheet.querySelector(".meal-sheet__name").textContent = m.t;
+    msheet.querySelector(".ms-sub").textContent = m.done
+      ? "Cooked · counts toward your " + s.label.toLowerCase() + " goal"
+      : "On the plan for this week";
+    function row(act, icon, style, label) {
+      return '<button class="meal-sheet__row" data-act="' + act + '"><span class="ico ico-24"><img src="assets/icons/' + icon + '" alt="" style="' + style + '" /></span>' + label + "</button>";
+    }
+    msheet.querySelector(".meal-sheet__list").innerHTML =
+      row("toggle", "check-sm.svg", "transform:translate(-50%,-50%);filter:invert(1);width:16px;height:12px", m.done ? "Mark as not cooked" : "Mark as cooked") +
+      row("swap", "swap-24.svg", "transform:translate(-50%,-50%);width:22px;height:22px", "Swap for another dinner") +
+      row("remove", "trash-2.svg", "transform:translate(-50%,-50%);width:22px;height:22px", "Remove from this week");
+    msheet.classList.add("open");
+    void msheet.offsetWidth;
+    msheet.classList.add("in");
+  };
+  T.closeMealSheet = function () {
+    msheet.classList.remove("in");
+    setTimeout(function () { msheet.classList.remove("open"); }, 480);
+  };
+  msheet.querySelector(".meal-sheet__scrim").addEventListener("click", T.closeMealSheet);
+  msheet.querySelector(".meal-sheet__list").addEventListener("click", function (e) {
+    var btn = e.target.closest(".meal-sheet__row");
+    if (!btn) return;
+    var i = msheet._i, s = T.cur(), slots = slotsFor(s.label);
+    if (btn.dataset.act === "toggle") {
+      slots[i].done = !slots[i].done;
+      saveState();
+      T.closeMealSheet();
+      if (T.onMealChange) T.onMealChange("toggle", i);
+    } else if (btn.dataset.act === "swap") {
+      T.closeMealSheet();
+      setTimeout(function () { T.openModal(i); }, 300);
+    } else if (btn.dataset.act === "remove") {
+      slots[i] = null;
+      saveState();
+      T.closeMealSheet();
+      if (T.onMealChange) T.onMealChange("remove", i);
+    }
+  });
+
+  /* long-press a dinner (in any concept) to open the actions sheet */
+  T.bindLongPress = function (container, fn) {
+    var timer = null, sx = 0, sy = 0, fired = false;
+    container.addEventListener("pointerdown", function (e) {
+      var btn = e.target.closest("[data-i]");
+      if (!btn) return;
+      sx = e.clientX; sy = e.clientY; fired = false;
+      clearTimeout(timer);
+      timer = setTimeout(function () { fired = true; fn(Number(btn.dataset.i)); }, 480);
+    });
+    container.addEventListener("pointermove", function (e) {
+      if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) clearTimeout(timer);
+    });
+    window.addEventListener("pointerup", function () { clearTimeout(timer); });
+    window.addEventListener("pointercancel", function () { clearTimeout(timer); });
+    container.addEventListener("click", function (e) {
+      if (fired) { e.preventDefault(); e.stopPropagation(); fired = false; }
+    }, true);
+  };
+
+  /* drag a bottom sheet down to dismiss it (shared Clove gesture) */
+  T.sheetDrag = function (card, closeFn, base) {
+    var d = null, sup = false;
+    card.addEventListener("pointerdown", function (e) {
+      if (card.scrollTop > 0) return;
+      d = { y: e.clientY, moved: false };
+    });
+    window.addEventListener("pointermove", function (e) {
+      if (!d) return;
+      var dy = e.clientY - d.y;
+      if (dy > 8) d.moved = true;
+      if (d.moved && dy > 0) {
+        card.style.transition = "none";
+        card.style.transform = (base || "") + " translateY(" + dy + "px)";
+      }
+    });
+    function release(e) {
+      if (!d) return;
+      var dy = e.clientY - d.y, moved = d.moved;
+      d = null;
+      card.style.transition = "";
+      card.style.transform = "";
+      if (moved && dy > 90) closeFn();
+      if (moved) { sup = true; setTimeout(function () { sup = false; }, 0); }
+    }
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
+    card.addEventListener("click", function (e) {
+      if (sup) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+  };
+  T.sheetDrag(modal.querySelector(".gl-sheet__card"), T.closeModal, "translate(-50%, 0)");
+  T.sheetDrag(msheet.querySelector(".meal-sheet__card"), T.closeMealSheet, "");
 
   /* ---- goal sheet ("What are you working on?") ---- */
   var sheet = document.getElementById("glSheet");
@@ -185,6 +300,7 @@
     }
     document.getElementById("glScrim").addEventListener("click", closeSheet);
     document.getElementById("glEdit").addEventListener("click", openSheet);
+    T.sheetDrag(sheet.querySelector(".gl-sheet__card"), closeSheet, "translate(-50%, 0)");
   };
 
   /* ---- pink nudge: press feedback only in this standalone deck ---- */
@@ -237,7 +353,11 @@
     var svg = document.getElementById("glChart");
     if (!svg) return;
     var goalN = r.goalN || parseFloat(String(r.goal).replace(/[^\d.]/g, "")) || 1;
-    var nowN = goalN * s.pct;
+    /* a cooked dinner is worth a real dinner's dose, and the y scale is
+       trimmed so every tick moves the line a visible step: five dinners
+       carry the line right up to the dotted goal line */
+    var dinnerWorth = 0.55 * goalN;
+    var nowN = T.doneCount(s.label) * dinnerWorth;
     var unit = r.unit || String(r.goal).replace(/[\d.,\s]/g, "");
     var weekPct = [0.31, 0.35, 0.28, 0, 0, 0, 0];
     var W = Math.round(svg.clientWidth) || 320, H = Math.round(svg.clientHeight) || 84, PAD = 8, run = 0, cum = [];
@@ -245,8 +365,9 @@
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     weekPct.forEach(function (p, i) { run += i === 3 ? nowN : p * goalN; cum.push(run); });
     var weekGoal = goalN * 7;
+    var yMax = weekGoal * 0.55;
     var x = function (i) { return (i / 6) * W; };
-    var y = function (v) { return H - PAD - Math.min(1, v / weekGoal) * (H - PAD * 2); };
+    var y = function (v) { return H - PAD - Math.min(1, v / yMax) * (H - PAD * 2); };
     var pts = [{ x: 0, y: H - PAD }].concat(cum.slice(0, 4).map(function (v, i) { return { x: x(i), y: y(v) }; }));
     var d = pts.map(function (p, i) {
       if (!i) return "M" + p.x.toFixed(1) + " " + p.y.toFixed(1);

@@ -67,7 +67,7 @@
     <div class="gl-sheet__card">
       <div class="gl-sheet__grab"></div>
       <h2 class="gl-sheet__h" id="g2ModalH">Iron-rich dinners</h2>
-      <p class="gl-sheet__s">Tap a dinner to add it to your week.</p>
+      <p class="gl-sheet__s" id="g2ModalS">Tap a dinner to add it to your week.</p>
       <div class="g2-rgrid" id="g2Rgrid"></div>
     </div>
   </div>
@@ -208,7 +208,21 @@
     }
 
     T.onAdd = function (free) { renderMeals(free); };
+    T.onMealChange = function () {
+      renderMeals(-1);
+      easeActiveRing();
+      setMeta(active, false);
+      T.drawWeek(T.cur());
+    };
+    T.bindLongPress(document.getElementById("g2Meals"), function (i) { T.openMealSheet(i); });
     T.makeSwipeable(document.getElementById("g2Car"), PITCH, function () { return T.slides().length; });
+    /* tapping a peeking plate slides to it */
+    document.getElementById("g2Car").addEventListener("click", function (e) {
+      var slide = e.target.closest(".g2-slide");
+      if (!slide) return;
+      var idx = Array.prototype.indexOf.call(this.children, slide);
+      if (idx > -1 && idx !== active) this.scrollTo({ left: idx * PITCH, behavior: "smooth" });
+    });
     T.bindSheet(render);
     T.bindNudge();
     render(true);

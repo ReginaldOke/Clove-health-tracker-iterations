@@ -236,3 +236,71 @@ body.c1 .gl-week { margin: 14px 0; }
 }
 .c3-chip:active { transform: scale(0.94); }
 body.c3 .gl-body { gap: 20px; }
+
+/* ============================================================
+   Meal actions sheet — same bones as plan.html's meal sheet
+   ============================================================ */
+.meal-sheet {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  bottom: 0;
+  width: 402px;
+  z-index: 92;
+  display: none;
+}
+.meal-sheet.open { display: block; }
+.meal-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 18, 21, 0.4);
+  opacity: 0;
+  transition: opacity 340ms ease;
+}
+.meal-sheet.in .meal-sheet__scrim { opacity: 1; }
+.meal-sheet__card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--white);
+  border-radius: 28px 28px 0 0;
+  padding: 10px 24px 30px;
+  transform: translateY(104%);
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  touch-action: none;
+}
+.meal-sheet.in .meal-sheet__card { transform: none; }
+.meal-sheet__grab {
+  display: block;
+  width: 48px;
+  height: 5px;
+  border-radius: 100px;
+  background: var(--black-200);
+  margin: 0 auto 18px;
+}
+.meal-sheet__head { display: flex; align-items: center; gap: 20px; padding: 4px 2px 20px; }
+.meal-sheet__img { width: 84px; height: 84px; border-radius: 16px; overflow: hidden; flex: none; }
+.meal-sheet__img img { width: 100%; height: 100%; object-fit: cover; }
+.meal-sheet__name { font-size: 20px; font-weight: 600; line-height: 1.25; color: var(--black-500); }
+.ms-sub { margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--black-400); }
+.meal-sheet__list { display: flex; flex-direction: column; padding-bottom: 4px; }
+.meal-sheet__row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 54px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 16.5px;
+  font-weight: 400;
+  color: var(--black-500);
+  text-align: left;
+  cursor: pointer;
+}
+.meal-sheet__row:active { background: var(--black-100); }
+.meal-sheet__row .ico { flex: none; }
