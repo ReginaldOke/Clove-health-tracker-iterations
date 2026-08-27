@@ -90,7 +90,7 @@
     position: fixed;
     left: 50%;
     bottom: 20px;
-    width: calc(var(--edge, 201px) * 2);
+    width: min(620px, calc(100vw - 48px));
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -241,7 +241,7 @@
         s = v.w / 402;
         frameH = Math.round(v.h / s);
       } else {
-        s = Math.min(1, (v.w - 300) / 402, (v.h - 195) / 874);
+        s = Math.min(1, (v.w - 300) / 402, (v.h - 150) / 874);
         frameH = 874;
       }
       document.querySelector(".stage").style.height = frameH + "px";
