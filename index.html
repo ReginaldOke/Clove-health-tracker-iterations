@@ -88,16 +88,17 @@
   /* ---- legend: which concept am I looking at ---- */
   .legend {
     position: fixed;
-    left: 26px;
+    left: 50%;
     bottom: 20px;
-    max-width: 300px;
+    width: calc(var(--edge, 201px) * 2);
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
     z-index: 20;
     pointer-events: none;
-    text-align: left;
+    text-align: center;
   }
   .legend h2 { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
   .legend .letter {
@@ -207,7 +208,7 @@
 </div>
 
 <footer class="legend">
-  <h2><span class="letter" id="cletter">A</span></h2>
+  <h2><span class="letter" id="cletter">A</span><span id="cname">Option A</span></h2>
   <p id="cdesc">Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it.</p>
 </footer>
 
@@ -216,7 +217,7 @@
     var CONCEPTS = [
       { name: "The dressed plate", desc: "Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it." },
       { name: "The clean plate", desc: "The calmest dial: the number rests on an empty plate with the cutlery set, week chart front and centre." },
-      { name: "Day by day", desc: "The health-app week chart, the Clove way: a dinner under every bar, goal-rich meals standing taller past the dotted goal line." },
+      { name: "Day by day", desc: "The health app week chart, the Clove way: a dinner under every bar, meals rich in your goal standing taller past the dotted goal line." },
     ];
     var i = Math.min(2, Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
     var track = document.getElementById("track");
@@ -265,6 +266,7 @@
       if (instant) { void track.offsetWidth; track.style.transition = ""; }
       for (var k = 0; k < slots.length; k++) slots[k].classList.toggle("on", k === i);
       document.getElementById("cletter").textContent = ["A", "B", "C"][i];
+      document.getElementById("cname").textContent = "Option " + ["A", "B", "C"][i];
       document.getElementById("cdesc").textContent = CONCEPTS[i].desc;
       document.getElementById("navPrev").style.visibility = i === 0 ? "hidden" : "visible";
       document.getElementById("navNext").style.visibility = i === CONCEPTS.length - 1 ? "hidden" : "visible";

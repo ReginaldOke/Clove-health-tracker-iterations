@@ -484,7 +484,7 @@
     var dinnerWorth = 0.55 * goalN;
     var nowN = T.doneCount(s.label) * dinnerWorth;
     var unit = s.unit || r.unit || String(r.goal).replace(/[\d.,\s]/g, "");
-    var SHAPES = { Iron: [0.22, 0.31, 0.24], Protein: [0.42, 0.27, 0.38], Fibre: [0.3, 0.45, 0.26] };
+    var SHAPES = { Iron: [0.1, 0.16, 0.52], Protein: [0.55, 0.1, 0.14], Fibre: [0.14, 0.55, 0.12] };
     var weekPct = (SHAPES[s.label] || [0.34, 0.26, 0.37]).concat([0, 0, 0, 0]);
     var W = Math.round(svg.clientWidth) || 320, H = Math.round(svg.clientHeight) || 84, PAD = 8, run = 0, cum = [];
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
