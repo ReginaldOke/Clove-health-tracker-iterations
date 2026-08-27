@@ -100,20 +100,20 @@
     pointer-events: none;
     text-align: center;
   }
-  .legend h2 { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 600; letter-spacing: -0.1px; }
+  .legend h2 { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; letter-spacing: -0.1px; }
   .legend .letter {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
+    width: 19px;
+    height: 19px;
+    border-radius: 6px;
     background: rgba(255, 255, 255, 0.12);
-    font-size: 12px;
+    font-size: 10.5px;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.85);
   }
-  .legend p { font-size: 12.5px; color: rgba(255, 255, 255, 0.45); line-height: 1.5; }
+  .legend p { font-size: 11.5px; color: rgba(255, 255, 255, 0.45); line-height: 1.5; }
 
   /* ---- floating prototype switcher: Clove liquid glass, mobile only ---- */
   /* lives inside the scaled stage (the stage IS the screen on mobile),
@@ -241,7 +241,7 @@
         s = v.w / 402;
         frameH = Math.round(v.h / s);
       } else {
-        s = Math.min(1, (v.w - 300) / 402, (v.h - 150) / 874);
+        s = Math.min(1, (v.w - 300) / 402, (v.h - 122) / 874);
         frameH = 874;
       }
       document.querySelector(".stage").style.height = frameH + "px";
