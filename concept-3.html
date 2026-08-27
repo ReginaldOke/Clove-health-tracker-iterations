@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" href="data:," />
 <title>Clove - Health goals, concept 3</title>
-<link rel="stylesheet" href="base.css?v=20260827e" />
-<link rel="stylesheet" href="memory.css?v=20260827e" />
-<link rel="stylesheet" href="goals.css?v=20260827e" />
-<link rel="stylesheet" href="goals2.css?v=20260827e" />
-<link rel="stylesheet" href="concepts.css?v=20260827e" />
+<link rel="stylesheet" href="base.css?v=20260827f" />
+<link rel="stylesheet" href="memory.css?v=20260827f" />
+<link rel="stylesheet" href="goals.css?v=20260827f" />
+<link rel="stylesheet" href="goals2.css?v=20260827f" />
+<link rel="stylesheet" href="concepts.css?v=20260827f" />
 </head>
 <body class="goals goals2 b3 c1">
 <div class="phone">
@@ -92,21 +92,30 @@
   </div>
 </div>
 
-<script src="app-lite.js?v=20260827e"></script>
-<script src="memory.js?v=20260827e"></script>
-<script src="goals.js?v=20260827e"></script>
-<script src="plates.js?v=20260827e"></script>
-<script src="tracker.js?v=20260827e"></script>
+<script src="app-lite.js?v=20260827f"></script>
+<script src="memory.js?v=20260827f"></script>
+<script src="goals.js?v=20260827f"></script>
+<script src="plates.js?v=20260827f"></script>
+<script src="tracker.js?v=20260827f"></script>
 <script>
   (function () {
     var T = Tracker, TOTAL = T.TOTAL;
     var R = "assets/img/recipes/";
 
     /* the goal accent, softened + solid, per ring colour token */
+    function tones(hue) {
+      /* solid + soft for the first meal, a lighter pair for the second */
+      return {
+        soft: "var(--" + hue + "-100)",
+        solid: "var(--" + hue + "-300)",
+        mid: "color-mix(in srgb, var(--" + hue + "-300) 45%, white)",
+        soft2: "color-mix(in srgb, var(--" + hue + "-100) 50%, white)",
+      };
+    }
     var TONE = {
-      "var(--eggplant-300)": { soft: "var(--eggplant-100)", solid: "var(--eggplant-300)" },
-      "var(--kale-300)": { soft: "var(--kale-100)", solid: "var(--kale-300)" },
-      "var(--paprika-300)": { soft: "var(--paprika-100)", solid: "var(--paprika-300)" },
+      "var(--eggplant-300)": tones("eggplant"),
+      "var(--kale-300)": tones("kale"),
+      "var(--paprika-300)": tones("paprika"),
     };
 
     /* ONE shared week of meals: the images never change between goals,
@@ -116,19 +125,21 @@
        below fill those days left to right (Tuesday first, Sunday last,
        keeping tall added bars clear of the goal label). */
     var WEEK_IMGS = [
-      R + "kale-caesar.webp",
+      [R + "kale-caesar.webp"],
       null,
       null,
-      R + "greens.webp",
-      R + "white-beans.webp",
+      [R + "greens.webp", R + "short-ribs.webp"],
+      [R + "white-beans.webp", R + "grain-bowl.webp"],
       null,
       null,
     ];
     var EMPTY_POS = [1, 2, 5, 6];
+    /* a day's vals entry is one number per meal cooked that day: Thursday
+       and Friday are two-meal days, so their bars render as segments */
     var CHART = {
-      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [9.2, 0, 0, 8.4, 6.8, 0, 0], rich: [0, 3], delta: "+6%" },
-      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [14, 0, 0, 12, 43, 0, 0], rich: [4], delta: "+11%" },
-      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [6.5, 0, 0, 13.2, 14.6, 0, 0], rich: [3, 4], delta: "+3%" },
+      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [[9.2], 0, 0, [5.6, 3.9], [4.2, 2.6], 0, 0], rich: [0, 3], delta: "+6%" },
+      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [[14], 0, 0, [11, 18], [26, 19], 0, 0], rich: [4], delta: "+11%" },
+      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [[6.5], 0, 0, [8.2, 4.8], [9.6, 5.2], 0, 0], rich: [3, 4], delta: "+3%" },
     };
     function chartFor(s) {
       if (CHART[s.label]) return CHART[s.label];
@@ -145,8 +156,10 @@
       return CHART.Iron;
     }
     function daysFor(s, c) {
-      var days = WEEK_IMGS.map(function (img, i) {
-        return img ? { img: img, v: c.vals[i], rich: c.rich.indexOf(i) > -1 } : null;
+      var days = WEEK_IMGS.map(function (imgs, i) {
+        if (!imgs) return null;
+        var v = c.vals[i];
+        return { imgs: imgs, vs: Array.isArray(v) ? v : [v], rich: c.rich.indexOf(i) > -1 };
       });
       /* meals added in ANY goal land on the same shared days, coloured by
          the goal they serve */
@@ -158,8 +171,8 @@
       });
       added.slice(0, EMPTY_POS.length).forEach(function (a, k) {
         days[EMPTY_POS[k]] = {
-          img: a.m.img,
-          v: Math.round((a.own ? c.goal * 1.12 : c.goal * 0.45) * 10) / 10,
+          imgs: [a.m.img],
+          vs: [Math.round((a.own ? c.goal * 1.12 : c.goal * 0.45) * 10) / 10],
           rich: a.own,
         };
       });
@@ -186,7 +199,7 @@
       document.getElementById("b3Title").innerHTML = '<span class="e">' + T.emojiFor(s.label) + "</span>" + s.label + " goal";
       /* stat: the average over the days you cooked */
       var cooked = days.filter(Boolean);
-      var avg = cooked.length ? cooked.reduce(function (a, d) { return a + d.v; }, 0) / cooked.length : 0;
+      var avg = cooked.length ? cooked.reduce(function (a, d) { return a + d.vs.reduce(function (x, y) { return x + y; }, 0); }, 0) / cooked.length : 0;
       document.getElementById("b3Avg").textContent = fmt(avg);
       document.getElementById("b3Unit").textContent = c.unitLabel;
       document.getElementById("b3Range").innerHTML = c.delta.charAt(0) === "+" ? "<b>" + c.delta + "</b> on last week" : c.delta;
@@ -199,13 +212,35 @@
         '<div class="b3-line b3-line--base" style="top:' + H + 'px"><span class="b3-line__lbl">0</span></div>' +
         '<div class="b3-goal" style="top:' + yTop(c.goal).toFixed(1) + "px;color:" + tone.solid + '"><span class="b3-goal__lbl">Goal ' + fmt(c.goal) + c.unit + "</span></div>";
       /* one column per day: bar, plate, letter */
+      /* shade pair: first meal solid, second meal lighter; the same
+         shade sits on the meal's border and its bar segment */
+      var SHADE = [
+        { line: tone.solid, fill: tone.soft, grey: "var(--black-100)" },
+        { line: tone.mid, fill: tone.soft2, grey: "#e9e7e3" },
+      ];
       document.getElementById("b3Cols").innerHTML = days.map(function (d, i) {
         var bar = "", thumb;
         if (d) {
-          bar = '<div class="b3-bar' + (d.rich ? " b3-bar--rich" : "") + '" style="--d:' + (i * 60) + "ms;height:" + ((d.v / c.yMax) * 100).toFixed(1) + "%;--tone:" + tone.solid + ";--tone-soft:" + tone.soft + '"></div>';
-          thumb = '<span class="b3-thumb' + (d.rich ? " b3-thumb--rich" : "") + '" style="--d:' + (120 + i * 60) + "ms;--tone:" + tone.solid + '"><img src="' + d.img + '" alt="" /></span>';
+          var tot = d.vs.reduce(function (a, b) { return a + b; }, 0);
+          if (d.vs.length > 1) {
+            /* two meals: one bar, segmented top-down as second then first */
+            var segs = d.vs.slice().reverse().map(function (v, k) {
+              var sh = SHADE[d.vs.length - 1 - k];
+              return '<i class="b3-seg' + (d.rich ? " b3-seg--rich" : "") + '" style="flex:' + v +
+                ";background:" + (d.rich ? sh.fill : sh.grey) +
+                (d.rich ? ";border-color:" + sh.line : "") + '"></i>';
+            }).join("");
+            bar = '<div class="b3-bar b3-bar--stack" style="--d:' + (i * 60) + "ms;height:" + ((tot / c.yMax) * 100).toFixed(1) + '%">' + segs + "</div>";
+          } else {
+            bar = '<div class="b3-bar' + (d.rich ? " b3-bar--rich" : "") + '" style="--d:' + (i * 60) + "ms;height:" + ((tot / c.yMax) * 100).toFixed(1) + "%;--tone:" + tone.solid + ";--tone-soft:" + tone.soft + '"></div>';
+          }
+          thumb = '<span class="b3-thumbs">' + d.imgs.map(function (img, k) {
+            return '<span class="b3-thumb' + (d.rich ? " b3-thumb--rich" : "") + (k ? " b3-thumb--under" : "") +
+              '" style="--d:' + (120 + i * 60 + k * 70) + "ms;--tone:" + (d.rich ? (k ? tone.mid : tone.solid) : "var(--black-200)") +
+              '"><img src="' + img + '" alt="" /></span>';
+          }).join("") + "</span>";
         } else {
-          thumb = '<span class="b3-thumb b3-thumb--empty"></span>';
+          thumb = '<span class="b3-thumbs"><span class="b3-thumb b3-thumb--empty"></span></span>';
         }
         return '<div class="b3-cell"><div class="b3-barwrap">' + bar + "</div>" + thumb +
           '<span class="b3-day' + (i === TODAY ? " today" : "") + '">' + LETTERS[i] + "</span></div>";

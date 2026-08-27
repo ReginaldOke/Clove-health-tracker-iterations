@@ -210,15 +210,15 @@
 
 <footer class="legend">
   <h2><span class="letter" id="cletter">A</span><span id="cname">Option A</span></h2>
-  <p id="cdesc">Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it.</p>
+  <p id="cdesc">A more branded health tracker with illustrations. Shows 1 health goal at a time and ties each health goal to recipes. Try adding a recipe and swiping to the next health goal.</p>
 </footer>
 
 <script>
   (function () {
     var CONCEPTS = [
-      { name: "The dressed plate", desc: "Each goal is a plate wearing its progress ring. Swipe the plate for the next goal, tick dinners off below it." },
-      { name: "The clean plate", desc: "The calmest dial: the number rests on an empty plate with the cutlery set, week chart front and centre." },
-      { name: "Day by day", desc: "The health app week chart, the Clove way: a dinner under every bar, meals rich in your goal standing taller past the dotted goal line." },
+      { name: "The dressed plate", desc: "A more branded health tracker with illustrations. Shows 1 health goal at a time and ties each health goal to recipes. Try adding a recipe and swiping to the next health goal." },
+      { name: "The clean plate", desc: "Similar to option A, but with a simpler health tracker chart and larger recipe cards." },
+      { name: "Day by day", desc: "Less fun but maybe more useful. Shows which recipes helped you hit each health goal, and how your progress has changed week to week." },
     ];
     var i = Math.min(2, Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
     var track = document.getElementById("track");
@@ -241,7 +241,7 @@
         s = v.w / 402;
         frameH = Math.round(v.h / s);
       } else {
-        s = Math.min(1, (v.w - 300) / 402, (v.h - 118) / 874);
+        s = Math.min(1, (v.w - 300) / 402, (v.h - 195) / 874);
         frameH = 874;
       }
       document.querySelector(".stage").style.height = frameH + "px";
