@@ -160,13 +160,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
     height: 26px;
+    padding: 0 10px;
     border-radius: 9px;
     background: rgba(15, 18, 21, 0.08);
     font-size: 13px;
     font-weight: 600;
     color: #0f1215;
+    white-space: nowrap;
   }
   .sw-letter.pop { animation: sw-pop 360ms cubic-bezier(0.22, 1.4, 0.36, 1); }
   @keyframes sw-pop { 0% { transform: scale(0.55); opacity: 0.3; } 100% { transform: scale(1); opacity: 1; } }
@@ -200,7 +201,7 @@
       </div>
       <div class="switcher" id="switcher">
         <button class="sw-btn sw-btn--prev" id="swPrev" aria-label="Previous prototype"><img src="assets/icons/chevron-rt.svg" alt="" /></button>
-        <span class="sw-letter" id="swLetter">A</span>
+        <span class="sw-letter" id="swLetter">Option A</span>
         <button class="sw-btn sw-btn--next" id="swNext" aria-label="Next prototype"><img src="assets/icons/chevron-rt.svg" alt="" /></button>
       </div>
     </div>
@@ -273,7 +274,7 @@
       document.getElementById("swPrev").disabled = i === 0;
       document.getElementById("swNext").disabled = i === CONCEPTS.length - 1;
       var letter = document.getElementById("swLetter");
-      letter.textContent = ["A", "B", "C"][i];
+      letter.textContent = "Option " + ["A", "B", "C"][i];
       if (!instant && i !== prev) {
         letter.classList.remove("pop");
         void letter.offsetWidth;
