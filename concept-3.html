@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" href="data:," />
 <title>Clove - Health goals, concept 3</title>
-<link rel="stylesheet" href="base.css?v=20260827f" />
-<link rel="stylesheet" href="memory.css?v=20260827f" />
-<link rel="stylesheet" href="goals.css?v=20260827f" />
-<link rel="stylesheet" href="goals2.css?v=20260827f" />
-<link rel="stylesheet" href="concepts.css?v=20260827f" />
+<link rel="stylesheet" href="base.css?v=20260827g" />
+<link rel="stylesheet" href="memory.css?v=20260827g" />
+<link rel="stylesheet" href="goals.css?v=20260827g" />
+<link rel="stylesheet" href="goals2.css?v=20260827g" />
+<link rel="stylesheet" href="concepts.css?v=20260827g" />
 </head>
 <body class="goals goals2 b3 c1">
 <div class="phone">
@@ -92,11 +92,11 @@
   </div>
 </div>
 
-<script src="app-lite.js?v=20260827f"></script>
-<script src="memory.js?v=20260827f"></script>
-<script src="goals.js?v=20260827f"></script>
-<script src="plates.js?v=20260827f"></script>
-<script src="tracker.js?v=20260827f"></script>
+<script src="app-lite.js?v=20260827g"></script>
+<script src="memory.js?v=20260827g"></script>
+<script src="goals.js?v=20260827g"></script>
+<script src="plates.js?v=20260827g"></script>
+<script src="tracker.js?v=20260827g"></script>
 <script>
   (function () {
     var T = Tracker, TOTAL = T.TOTAL;
@@ -124,22 +124,24 @@
        and midweek stay blank so the empty state shows, and meals added
        below fill those days left to right (Tuesday first, Sunday last,
        keeping tall added bars clear of the goal label). */
+    /* the week holds exactly the meals the goal plans say were cooked
+       (today is Thursday, so nothing sits in the future): Monday was
+       Caesar + chicken bake, Thursday greens + beans. A day's vals entry
+       is one number per meal, so two-meal days render segmented bars. */
     var WEEK_IMGS = [
-      [R + "kale-caesar.webp"],
+      [R + "kale-caesar.webp", R + "chicken-bake.webp"],
       null,
       null,
-      [R + "greens.webp", R + "short-ribs.webp"],
-      [R + "white-beans.webp", R + "grain-bowl.webp"],
+      [R + "greens.webp", R + "white-beans.webp"],
+      null,
       null,
       null,
     ];
-    var EMPTY_POS = [1, 2, 5, 6];
-    /* a day's vals entry is one number per meal cooked that day: Thursday
-       and Friday are two-meal days, so their bars render as segments */
+    var EMPTY_POS = [4, 5, 1, 2, 6];
     var CHART = {
-      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [[9.2], 0, 0, [5.6, 3.9], [4.2, 2.6], 0, 0], rich: [0, 3], delta: "+6%" },
-      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [[14], 0, 0, [11, 18], [26, 19], 0, 0], rich: [4], delta: "+11%" },
-      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [[6.5], 0, 0, [8.2, 4.8], [9.6, 5.2], 0, 0], rich: [3, 4], delta: "+3%" },
+      Iron: { unit: "mg", unitLabel: "mg iron", goal: 8, yMax: 12, vals: [[6.8, 2.1], 0, 0, [5.2, 3.7], 0, 0, 0], rich: [0, 3], delta: "+6%" },
+      Protein: { unit: "g", unitLabel: "g protein", goal: 40, yMax: 60, vals: [[6, 35], 0, 0, [8, 22], 0, 0, 0], rich: [0], delta: "+11%" },
+      Fibre: { unit: "g", unitLabel: "g fibre", goal: 12, yMax: 18, vals: [[4.2, 1.9], 0, 0, [7.4, 6.1], 0, 0, 0], rich: [3], delta: "+3%" },
     };
     function chartFor(s) {
       if (CHART[s.label]) return CHART[s.label];

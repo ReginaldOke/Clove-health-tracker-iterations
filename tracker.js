@@ -50,7 +50,7 @@
       ],
       slots: [
         { img: R + "greens.webp", t: "Braised greens & lemon", done: true },
-        { img: R + "grain-bowl.webp", t: "Grain bowl", done: true },
+        { img: R + "white-beans.webp", t: "Beans in olive oil", done: true },
         null, null, null,
       ],
     },
