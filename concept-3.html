@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" href="data:," />
 <title>Clove - Health goals, concept 3</title>
-<link rel="stylesheet" href="base.css?v=20260827h" />
-<link rel="stylesheet" href="memory.css?v=20260827h" />
-<link rel="stylesheet" href="goals.css?v=20260827h" />
-<link rel="stylesheet" href="goals2.css?v=20260827h" />
-<link rel="stylesheet" href="concepts.css?v=20260827h" />
+<link rel="stylesheet" href="base.css?v=20260827i" />
+<link rel="stylesheet" href="memory.css?v=20260827i" />
+<link rel="stylesheet" href="goals.css?v=20260827i" />
+<link rel="stylesheet" href="goals2.css?v=20260827i" />
+<link rel="stylesheet" href="concepts.css?v=20260827i" />
 </head>
 <body class="goals goals2 b3 c1">
 <div class="phone">
@@ -91,11 +91,11 @@
   </div>
 </div>
 
-<script src="app-lite.js?v=20260827h"></script>
-<script src="memory.js?v=20260827h"></script>
-<script src="goals.js?v=20260827h"></script>
-<script src="plates.js?v=20260827h"></script>
-<script src="tracker.js?v=20260827h"></script>
+<script src="app-lite.js?v=20260827i"></script>
+<script src="memory.js?v=20260827i"></script>
+<script src="goals.js?v=20260827i"></script>
+<script src="plates.js?v=20260827i"></script>
+<script src="tracker.js?v=20260827i"></script>
 <script>
   (function () {
     var T = Tracker, TOTAL = T.TOTAL;
@@ -226,8 +226,9 @@
           if (d.vs.length > 1) {
             /* two meals: one bar, segmented top-down as second then first */
             var segs = d.vs.slice().reverse().map(function (v, k) {
-              var sh = SHADE[d.vs.length - 1 - k];
-              return '<i class="b3-seg' + (d.rich ? " b3-seg--rich" : "") + '" style="flex:' + v +
+              var m = d.vs.length - 1 - k;
+              var sh = SHADE[m];
+              return '<i class="b3-seg' + (d.rich ? " b3-seg--rich" : "") + '" data-m="' + m + '" style="flex:' + v +
                 ";background:" + (d.rich ? sh.fill : sh.grey) +
                 (d.rich ? ";border-color:" + sh.line : "") + '"></i>';
             }).join("");
@@ -235,10 +236,12 @@
           } else {
             bar = '<div class="b3-bar' + (d.rich ? " b3-bar--rich" : "") + '" style="--d:' + (i * 60) + "ms;height:" + ((tot / c.yMax) * 100).toFixed(1) + "%;--tone:" + tone.solid + ";--tone-soft:" + tone.soft + '"></div>';
           }
-          thumb = '<span class="b3-thumbs">' + d.imgs.map(function (img, k) {
-            return '<span class="b3-thumb' + (d.rich ? " b3-thumb--rich" : "") + (k ? " b3-thumb--under" : "") +
-              '" style="--d:' + (120 + i * 60 + k * 70) + "ms;--tone:" + (d.rich ? (k ? tone.mid : tone.solid) : "var(--black-200)") +
-              '"><img src="' + img + '" alt="" /></span>';
+          var order = d.imgs.map(function (_, k) { return k; });
+          if (order.length > 1) order.reverse(); /* lighter shade on top, same as the bar */
+          thumb = '<span class="b3-thumbs">' + order.map(function (m, r) {
+            return '<span class="b3-thumb' + (d.rich ? " b3-thumb--rich" : "") + (r ? " b3-thumb--under" : "") + (order.length > 1 ? " b3-thumb--pick" : "") +
+              '" data-m="' + m + '" style="--d:' + (120 + i * 60 + r * 70) + "ms;--tone:" + (d.rich ? (m ? tone.mid : tone.solid) : "var(--black-200)") +
+              '"><img src="' + d.imgs[m] + '" alt="" /></span>';
           }).join("") + "</span>";
         } else {
           thumb = '<span class="b3-thumbs"><span class="b3-thumb b3-thumb--empty"></span></span>';
@@ -296,6 +299,24 @@
         body.classList.remove("b3-body--fade");
       }, 150);
     }
+    /* tap a stacked day's thumbnail to spotlight that meal: it and its
+       bar segment stay full while the other meal fades back */
+    document.getElementById("b3Cols").addEventListener("click", function (e) {
+      var th = e.target.closest(".b3-thumb--pick");
+      if (!th) return;
+      var cell = th.closest(".b3-cell");
+      var parts = cell.querySelectorAll(".b3-thumb--pick, .b3-seg");
+      var was = th.classList.contains("sel");
+      parts.forEach(function (el) {
+        /* the entrance animation pins opacity via its fill mode; retire it
+           (b3-thumb--awake: animation none, opacity 1) so dim/sel own it */
+        if (el.classList.contains("b3-thumb--pick")) el.classList.add("b3-thumb--awake");
+        el.classList.remove("sel", "dim");
+      });
+      if (was) return; /* tapping the spotlit meal again clears it */
+      parts.forEach(function (el) { el.classList.add(el.dataset.m === th.dataset.m ? "sel" : "dim"); });
+    });
+
     document.getElementById("b3Prev").addEventListener("click", function () { step(-1); });
     document.getElementById("b3Next").addEventListener("click", function () { step(1); });
 

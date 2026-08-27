@@ -351,7 +351,9 @@ body.b3 .gl-body { gap: 20px; }
 .b3-bar--rich { background: var(--tone-soft); border: 2px solid var(--tone); border-bottom-width: 0; }
 /* a two-meal day: one bar, segmented; each segment wears its meal's shade */
 .b3-bar--stack { display: flex; flex-direction: column; gap: 3px; background: none; }
-.b3-seg { display: block; flex: 1; min-height: 9px; border-radius: 4px; }
+.b3-seg { display: block; flex: 1; min-height: 9px; border-radius: 4px; transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+.b3-seg.dim { opacity: 0.2; }
+.b3-thumb--pick { cursor: pointer; transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1), transform 280ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms ease; }
 .b3-seg:first-child { border-radius: 9px 9px 4px 4px; }
 .b3-seg--rich { border: 2px solid; }
 .b3-seg--rich:last-child { border-bottom-width: 0; }
@@ -383,6 +385,11 @@ body.b3 .gl-body { gap: 20px; }
 .b3-thumb--rich { border-color: var(--tone); border-width: 3px; }
 .b3-thumb--under { margin-top: -7px; z-index: 0; }
 .b3-thumb--empty { border-style: dashed; background: #fcfbfb; opacity: 1; animation: none; }
+/* spotlight states: the first tap retires the entrance animation (awake)
+   so opacity belongs to dim/sel from then on */
+.b3-thumb.b3-thumb--awake { animation: none; opacity: 1; }
+.b3-thumb--pick.dim { opacity: 0.3; }
+.b3-thumb--pick.sel { transform: scale(1.12); z-index: 2; box-shadow: 0 4px 12px rgba(15, 18, 21, 0.2); }
 .b3-day { margin-top: 7px; font-size: 11px; color: var(--black-300); }
 .b3-thumbs + .b3-day { margin-top: 0; }
 /* the five goal meals wear the same border as their bars in the chart */
