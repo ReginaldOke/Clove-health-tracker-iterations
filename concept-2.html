@@ -101,7 +101,7 @@
 
     /* ---- hero: full-width plate slides, % lives ON the plate ---- */
     function setMeta(i) {
-      document.getElementById("g2Lbl").textContent = T.emojiFor(T.slides()[i].label) + " " + T.slides()[i].label + " goal";
+      document.getElementById("g2Lbl").textContent = T.slides()[i].label + " goal";
       document.querySelectorAll("#g2Dots i").forEach(function (d, j) { d.classList.toggle("on", j === i); });
     }
     function setPlatePct(i, animatePct) {

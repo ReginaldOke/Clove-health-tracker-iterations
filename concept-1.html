@@ -100,7 +100,7 @@
     /* ---- hero carousel: an illustrated plate per goal ---- */
     function setMeta(i, animatePct) {
       var s = T.slides()[i];
-      document.getElementById("g2Lbl").textContent = T.emojiFor(s.label) + " " + s.label + " goal";
+      document.getElementById("g2Lbl").textContent = s.label + " goal";
       var pctEl = document.getElementById("g2Pct");
       var target = Math.round(s.pct * 100);
       clearInterval(pctEl._iv);
